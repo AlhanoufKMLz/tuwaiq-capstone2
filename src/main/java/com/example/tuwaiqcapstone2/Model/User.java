@@ -50,6 +50,11 @@ public class User {
     @Positive(message = "Age must be positive number")
     private Integer age;
 
+    @Column(columnDefinition = "varchar(15) not null unique")
+    @NotEmpty(message = "Phone number must not be empty")
+    @Pattern(regexp = "^\\+?[0-9]{10,15}$", message = "Invalid phone number")
+    private String phoneNumber;
+
     @ElementCollection
     @Enumerated(EnumType.STRING)
     @CollectionTable(name = "user_allergens")

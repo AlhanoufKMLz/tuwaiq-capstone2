@@ -46,4 +46,11 @@ public class UserController {
         userService.deleteUser(id);
         return ResponseEntity.status(200).body(new ApiResponse("User deleted successfully"));
     }
+
+
+    //EXTRA ENDPOINTS
+    @DeleteMapping("/get-most-recipe")
+    public ResponseEntity<?> findUserWithMostRecipes(){
+        return ResponseEntity.status(200).body(userService.findUserWithMostRecipes());
+    }
 }

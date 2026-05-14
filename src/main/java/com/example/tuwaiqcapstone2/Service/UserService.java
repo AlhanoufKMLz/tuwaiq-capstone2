@@ -34,6 +34,7 @@ public class UserService {
         oldUser.setPassword(user.getPassword());
         oldUser.setEmail(user.getEmail());
         oldUser.setAge(user.getAge());
+        oldUser.setPhoneNumber(user.getPhoneNumber());
         oldUser.setAllergens(user.getAllergens());
         userRepository.save(oldUser);
     }
@@ -43,5 +44,15 @@ public class UserService {
         if(user == null) throw new ApiException("User not found");
 
         userRepository.delete(user);
+    }
+
+
+    //EXTRA ENDPOINTS
+    public User findUserWithMostRecipes(){
+        User user = userRepository.findUserWithMostRecipes();
+
+        if(user == null) throw new ApiException("User not found");
+
+        return user;
     }
 }
