@@ -26,22 +26,16 @@ public class CommentService {
     }
 
     public void addComment(Comment comment){
-        User user = userRepository.findUserById(comment.getUserId());
-        if(user == null) throw new ApiException("User not found"); //check user
-        Recipe recipe = recipeRepository.findRecipeById(comment.getRecipeId());
-        if(recipe == null) throw new ApiException("Recipe not found"); //check recipe
+        checkUser(comment.getUserId());
+        checkRecipe(comment.getRecipeId());
 
         commentRepository.save(comment);
     }
 
     public void updateComment(Integer id, Comment comment){
-        Comment oldComment = commentRepository.findCommentById(id);
-        if(oldComment == null) throw new ApiException("Comment not found"); //check comment
-
-        User user = userRepository.findUserById(comment.getUserId());
-        if(user == null) throw new ApiException("User not found"); //check user
-        Recipe recipe = recipeRepository.findRecipeById(comment.getRecipeId());
-        if(recipe == null) throw new ApiException("Recipe not found"); //check recipe
+        Comment oldComment = checkComment(id);
+        checkUser(comment.getUserId());
+        checkRecipe(comment.getRecipeId());
 
         oldComment.setUserId(comment.getUserId());
         oldComment.setUserId(comment.getUserId());
@@ -50,9 +44,45 @@ public class CommentService {
     }
 
     public void deleteComment(Integer id){
+        Comment comment = checkComment(id);
+        commentRepository.delete(comment);
+    }
+
+
+    //EXTRA ENDPOINTS
+    public List<Comment> findCommentByRecipeId(Integer recipeId){
+        checkRecipe(recipeId);
+        List<Comment> comments = commentRepository.findCommentByRecipeId(recipeId);
+
+        if(comments.isEmpty()) throw new ApiException("No comments found");
+
+        return comments;
+    }
+
+    public List<Comment> findCommentByUserId(Integer userId){
+        checkRecipe(userId);
+        List<Comment> comments = commentRepository.findCommentByUserId(userId);
+
+        if(comments.isEmpty()) throw new ApiException("No comments found");
+
+        return comments;    }
+
+
+    //HELPER METHODS
+    public Comment checkComment(Integer id){
         Comment comment = commentRepository.findCommentById(id);
         if(comment == null) throw new ApiException("Comment not found"); //check comment
 
-        commentRepository.delete(comment);
+        return comment;
+    }
+
+    public void checkUser(Integer id){
+        User user = userRepository.findUserById(id);
+        if(user == null) throw new ApiException("User not found"); //check user
+    }
+
+    public void checkRecipe(Integer id){
+        Recipe recipe = recipeRepository.findRecipeById(id);
+        if(recipe == null) throw new ApiException("Recipe not found"); //check recipe
     }
 }
