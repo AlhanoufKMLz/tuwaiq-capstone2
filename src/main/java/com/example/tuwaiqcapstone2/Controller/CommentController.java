@@ -46,4 +46,16 @@ public class CommentController {
         commentService.deleteComment(id);
         return ResponseEntity.status(200).body(new ApiResponse("Comment deleted successfully"));
     }
+
+
+    //EXTRA ENDPOINTS
+    @GetMapping("/get-recipe/{recipeId}")
+    public ResponseEntity<?> findCommentByRecipeId(@PathVariable Integer recipeId){
+        return ResponseEntity.status(200).body(commentService.findCommentByRecipeId(recipeId));
+    }
+
+    @GetMapping("/get-user/{userId}")
+    public ResponseEntity<?> findCommentByUserId(@PathVariable Integer userId){
+        return ResponseEntity.status(200).body(commentService.findCommentByUserId(userId));
+    }
 }
