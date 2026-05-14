@@ -1,6 +1,7 @@
 package com.example.tuwaiqcapstone2.Controller;
 
 import com.example.tuwaiqcapstone2.Api.ApiResponse;
+import com.example.tuwaiqcapstone2.Enums.DifficultyLevel;
 import com.example.tuwaiqcapstone2.Model.Recipe;
 import com.example.tuwaiqcapstone2.Service.RecipeService;
 import jakarta.validation.Valid;
@@ -49,6 +50,21 @@ public class RecipeController {
 
 
     //EXTRA ENDPOINTS
+    @GetMapping("/get-category/{categoryId}")
+    public ResponseEntity<?> findRecipeByCategoryId(@PathVariable Integer categoryId){
+        return ResponseEntity.status(200).body(recipeService.findRecipeByCategoryId(categoryId));
+    }
+
+    @GetMapping("/get-user/{userId}")
+    public ResponseEntity<?> findRecipeByUserId(@PathVariable Integer userId){
+        return ResponseEntity.status(200).body(recipeService.findRecipeByUserId(userId));
+    }
+
+    @GetMapping("/get-difficulty/{difficulty}")
+    public ResponseEntity<?> findRecipeByDifficulty(@PathVariable DifficultyLevel difficulty){
+        return ResponseEntity.status(200).body(recipeService.findRecipeByDifficulty(difficulty));
+    }
+
     @GetMapping("/get-no-allergen")
     public ResponseEntity<?> findRecipeWithNoAllergens(){
         return ResponseEntity.status(200).body(recipeService.findRecipeWithNoAllergens());
@@ -57,6 +73,11 @@ public class RecipeController {
     @GetMapping("/get-name/{keyword}")
     public ResponseEntity<?> findRecipeByName(@PathVariable String keyword){
         return ResponseEntity.status(200).body(recipeService.findRecipeByName(keyword));
+    }
+
+    @GetMapping("/get-cookTime/{minutes}")
+    public ResponseEntity<?> getRecipesWithCookTimeLessThan(@PathVariable Integer minutes){
+        return ResponseEntity.status(200).body(recipeService.getRecipesWithCookTimeLessThan(minutes));
     }
 
     @GetMapping("/get-most-comment")
@@ -68,4 +89,20 @@ public class RecipeController {
     public ResponseEntity<?> findTopRatedRecipes(){
         return ResponseEntity.status(200).body(recipeService.findTopRatedRecipes());
     }
+
+    @GetMapping("/get-top-rated-week")
+    public ResponseEntity<?> findTopRatedRecipesThisWeek(){
+        return ResponseEntity.status(200).body(recipeService.findTopRatedRecipesThisWeek());
+    }
+
+    @GetMapping("/get-user-favorite/{userId}")
+    public ResponseEntity<?> findUserFavoritesRecipes(@PathVariable Integer userId){
+        return ResponseEntity.status(200).body(recipeService.findUserFavoritesRecipes(userId));
+    }
+
+    @GetMapping("/get-similar/{recipeId}")
+    public ResponseEntity<?> findSimilarRecipes(@PathVariable Integer recipeId){
+        return ResponseEntity.status(200).body(recipeService.findSimilarRecipes(recipeId));
+    }
+
 }
