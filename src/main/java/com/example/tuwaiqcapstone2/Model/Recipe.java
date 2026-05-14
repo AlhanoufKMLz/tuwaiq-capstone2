@@ -29,7 +29,7 @@ public class Recipe {
     @NotNull(message = "Category Id must not be null")
     private Integer categoryId;
 
-    @Column(columnDefinition = "varchar(20) not null")
+    @Column(columnDefinition = "varchar(20) not null unique")
     @NotEmpty(message = "Name must not be empty")
     @Pattern(regexp = "^[a-zA-Z0-9 ]{3,100}$", message = "Name must be 3-100 alphanumeric characters")
     private String name;

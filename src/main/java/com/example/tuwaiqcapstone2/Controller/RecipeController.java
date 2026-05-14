@@ -46,4 +46,26 @@ public class RecipeController {
         recipeService.deleteRecipe(id);
         return ResponseEntity.status(200).body(new ApiResponse("Recipe deleted successfully"));
     }
+
+
+    //EXTRA ENDPOINTS
+    @GetMapping("/get-no-allergen")
+    public ResponseEntity<?> findRecipeWithNoAllergens(){
+        return ResponseEntity.status(200).body(recipeService.findRecipeWithNoAllergens());
+    }
+
+    @GetMapping("/get-name/{keyword}")
+    public ResponseEntity<?> findRecipeByName(@PathVariable String keyword){
+        return ResponseEntity.status(200).body(recipeService.findRecipeByName(keyword));
+    }
+
+    @GetMapping("/get-most-comment")
+    public ResponseEntity<?> findRecipeWithMostComments(){
+        return ResponseEntity.status(200).body(recipeService.findRecipeWithMostComments());
+    }
+
+    @GetMapping("/get-top-rated")
+    public ResponseEntity<?> findTopRatedRecipes(){
+        return ResponseEntity.status(200).body(recipeService.findTopRatedRecipes());
+    }
 }
