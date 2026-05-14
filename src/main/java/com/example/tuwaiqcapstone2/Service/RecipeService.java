@@ -60,4 +60,38 @@ public class RecipeService {
 
         recipeRepository.delete(recipe);
     }
+
+
+    //EXTRA ENDPOINTS
+    public List<Recipe> findRecipeWithNoAllergens(){
+        List<Recipe> recipes = recipeRepository.findRecipeByAllergensEmpty();
+
+        if(recipes.isEmpty()) throw new ApiException("No recipes found");
+
+        return recipes;
+    }
+
+    public List<Recipe> findRecipeByName(String keyword){
+        List<Recipe> recipes = recipeRepository.findRecipeByNameKeyword(keyword);
+
+        if(recipes.isEmpty()) throw new ApiException("Recipe not found");
+
+        return recipes;
+    }
+
+    public List<Recipe> findRecipeWithMostComments(){
+        List<Recipe> recipes = recipeRepository.findRecipeWithMostComments();
+
+        if(recipes.isEmpty()) throw new ApiException("No recipes found");
+
+        return recipes;
+    }
+
+    public List<Recipe> findTopRatedRecipes(){
+        List<Recipe> recipes = recipeRepository.findTopRatedRecipes();
+
+        if(recipes.isEmpty()) throw new ApiException("No recipes found");
+
+        return recipes;
+    }
 }
