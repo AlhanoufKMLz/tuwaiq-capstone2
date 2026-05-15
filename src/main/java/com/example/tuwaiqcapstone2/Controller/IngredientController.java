@@ -50,7 +50,7 @@ public class IngredientController {
 
     //EXTRA ENDPOINTS
     @GetMapping("/get-recipe/{recipeId}")
-    public ResponseEntity<?> getAllIngredients(@PathVariable Integer recipeId){
+    public ResponseEntity<?> findIngredientByRecipeId(@PathVariable Integer recipeId){
         return ResponseEntity.status(200).body(ingredientService.findIngredientByRecipeId(recipeId));
     }
 

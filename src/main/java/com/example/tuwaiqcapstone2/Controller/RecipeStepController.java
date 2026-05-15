@@ -25,7 +25,7 @@ public class RecipeStepController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> addRatRecipeStep(@RequestBody @Valid RecipeStep recipeStep, Errors errors){
+    public ResponseEntity<?> addRecipeStep(@RequestBody @Valid RecipeStep recipeStep, Errors errors){
         if(errors.hasErrors())
             return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
 
