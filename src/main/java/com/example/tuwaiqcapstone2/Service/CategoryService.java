@@ -14,6 +14,7 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
 
+
     //BASIC CRUD
     public List<Category> getAllCategories(){
         return categoryRepository.findAll();
@@ -24,17 +25,24 @@ public class CategoryService {
     }
 
     public void updateCategory(Integer id, Category category){
-        Category oldCategory = categoryRepository.findCategoryById(id);
-        if(oldCategory == null) throw new ApiException("Category not found"); //check category
+        Category oldCategory = checkCategory(id);
 
         oldCategory.setName(category.getName());
         categoryRepository.save(oldCategory);
     }
 
     public void deleteCategory(Integer id){
+        Category category = checkCategory(id);
+
+        categoryRepository.delete(category);
+    }
+
+
+    //HELPER METHODS
+    private Category checkCategory(Integer id){
         Category category = categoryRepository.findCategoryById(id);
         if(category == null) throw new ApiException("Category not found"); //check category
 
-        categoryRepository.delete(category);
+        return category;
     }
 }
