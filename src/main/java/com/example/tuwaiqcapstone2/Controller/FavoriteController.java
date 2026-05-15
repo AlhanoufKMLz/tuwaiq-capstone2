@@ -46,4 +46,16 @@ public class FavoriteController {
         favoriteService.deleteFavorite(id);
         return ResponseEntity.status(200).body(new ApiResponse("Favorite deleted successfully"));
     }
+
+
+    //EXTRA ENDPOINTS
+    @GetMapping("/get-recipe/{recipeId}")
+    public ResponseEntity<?> findFavoriteByRecipeId(@PathVariable Integer recipeId){
+        return ResponseEntity.status(200).body(favoriteService.findFavoriteByRecipeId(recipeId));
+    }
+
+    @GetMapping("/get-user/{userId}")
+    public ResponseEntity<?> findFavoriteByUserId(@PathVariable Integer userId){
+        return ResponseEntity.status(200).body(favoriteService.findFavoriteByRecipeId(userId));
+    }
 }

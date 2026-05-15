@@ -29,10 +29,8 @@ public class FavoriteService {
     }
 
     public void addFavorite(Favorite favorite){
-        User user = userRepository.findUserById(favorite.getUserId());
-        if(user == null) throw new ApiException("User not found"); //check user
-        Recipe recipe = recipeRepository.findRecipeById(favorite.getRecipeId());
-        if(recipe == null) throw new ApiException("Recipe not found"); //check recipe
+        Recipe recipe = checkRecipe(favorite.getRecipeId());
+        User user  = checkUser(favorite.getUserId());
 
         //check allergens
         List<AllergenType> userAllergens = user.getAllergens();
@@ -51,13 +49,9 @@ public class FavoriteService {
     }
 
     public void updateFavorite(Integer id, Favorite favorite){
-        User user = userRepository.findUserById(favorite.getUserId());
-        if(user == null) throw new ApiException("User not found"); //check user
-        Recipe recipe = recipeRepository.findRecipeById(favorite.getRecipeId());
-        if(recipe == null) throw new ApiException("Recipe not found"); //check recipe
-
-        Favorite oldFavorite = favoriteRepository.findFavoriteById(id);
-        if(oldFavorite == null) throw new ApiException("Favorite not found"); //check favorite
+        Favorite oldFavorite = checkFavorite(id);
+        checkRecipe(favorite.getRecipeId());
+        checkUser(favorite.getUserId());
 
         oldFavorite.setUserId(favorite.getUserId());
         oldFavorite.setRecipeId(favorite.getRecipeId());
@@ -65,9 +59,43 @@ public class FavoriteService {
     }
 
     public void deleteFavorite(Integer id){
-        Favorite favorite = favoriteRepository.findFavoriteById(id);
-        if(favorite == null) throw new ApiException("Favorite not found"); //check favorite
+        Favorite favorite = checkFavorite(id);
 
         favoriteRepository.delete(favorite);
+    }
+
+    //EXTRA ENDPOINTS
+    public List<Favorite> findFavoriteByRecipeId(Integer recipeId){
+        checkRecipe(recipeId);
+
+        return favoriteRepository.findFavoriteByRecipeId(recipeId);
+    }
+
+    public List<Favorite> findFavoriteByUserId(Integer userId){
+        checkRecipe(userId);
+
+        return favoriteRepository.findFavoriteByUserId(userId);
+    }
+
+
+    //HELPER METHODS
+    private Favorite checkFavorite(Integer id){
+        Favorite favorite = favoriteRepository.findFavoriteById(id);
+        if(favorite == null) throw new ApiException("Favorite not found"); //check favorite
+        return favorite;
+    }
+
+    private User checkUser(Integer id){
+        User user = userRepository.findUserById(id);
+        if(user == null) throw new ApiException("User not found"); //user recipe
+
+        return user;
+    }
+
+    private Recipe checkRecipe(Integer id){
+        Recipe recipe = recipeRepository.findRecipeById(id);
+        if(recipe == null) throw new ApiException("Recipe not found"); //check recipe
+
+        return recipe;
     }
 }
