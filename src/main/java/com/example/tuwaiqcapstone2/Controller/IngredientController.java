@@ -46,4 +46,16 @@ public class IngredientController {
         ingredientService.deleteIngredient(id);
         return ResponseEntity.status(200).body(new ApiResponse("Ingredient deleted successfully"));
     }
+
+
+    //EXTRA ENDPOINTS
+    @GetMapping("/get-recipe/{recipeId}")
+    public ResponseEntity<?> getAllIngredients(@PathVariable Integer recipeId){
+        return ResponseEntity.status(200).body(ingredientService.findIngredientByRecipeId(recipeId));
+    }
+
+    @GetMapping("/get-substitute/{ingredientId}")
+    public ResponseEntity<?> findIngredientSubstitute(@PathVariable Integer ingredientId){
+        return ResponseEntity.status(200).body(new ApiResponse(ingredientService.findIngredientSubstitute(ingredientId)));
+    }
 }

@@ -4,7 +4,6 @@ import com.example.tuwaiqcapstone2.Api.ApiException;
 import com.example.tuwaiqcapstone2.Enums.AllergenType;
 import com.example.tuwaiqcapstone2.Model.Ingredient;
 import com.example.tuwaiqcapstone2.Model.Recipe;
-import com.example.tuwaiqcapstone2.Model.User;
 import com.example.tuwaiqcapstone2.Repository.IngredientRepository;
 import com.example.tuwaiqcapstone2.Repository.RecipeRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,14 +20,14 @@ public class IngredientService {
     private final RecipeRepository recipeRepository;
     private final AiService aiService;
 
+
     //BASIC CRUD
     public List<Ingredient> getAllIngredients(){
         return ingredientRepository.findAll();
     }
 
     public void addIngredient(Ingredient ingredient){
-        Recipe recipe = recipeRepository.findRecipeById(ingredient.getRecipeId());
-        if(recipe == null) throw new ApiException("Recipe not found"); //check recipe
+        Recipe recipe = checkRecipe(ingredient.getRecipeId());
 
         //use Ai to update recipe allergens
         String prompt = "Given this ingredient: " + ingredient.getName() +
@@ -55,11 +54,8 @@ public class IngredientService {
     }
 
     public void updateIngredient(Integer id, Ingredient ingredient){
-        Ingredient oldIngredient = ingredientRepository.findIngredientById(id);
-        if(oldIngredient == null) throw new ApiException("Ingredient not found"); //check ingredient
-
-        Recipe recipe = recipeRepository.findRecipeById(ingredient.getRecipeId());
-        if(recipe == null) throw new ApiException("Recipe not found"); //check recipe
+        Ingredient oldIngredient = checkIngredient(id);
+        checkRecipe(ingredient.getRecipeId());
 
         oldIngredient.setRecipeId(ingredient.getRecipeId());
         oldIngredient.setName(ingredient.getName());
@@ -69,9 +65,42 @@ public class IngredientService {
     }
 
     public void deleteIngredient(Integer id){
+        Ingredient ingredient = checkIngredient(id);
+
+        ingredientRepository.delete(ingredient);
+    }
+
+
+    //EXTRA ENDPOINT
+    public List<Ingredient> findIngredientByRecipeId(Integer recipeId){
+        checkRecipe(recipeId);
+
+        return ingredientRepository.findIngredientByRecipeId(recipeId);
+    }
+
+    public String findIngredientSubstitute(Integer ingredientId) {
+        Ingredient ingredient = checkIngredient(ingredientId);
+
+        String prompt = "Suggest one substitute for this ingredient: " + ingredient.getName() +
+                ". Return ONLY the substitute name and a brief reason in one sentence. " +
+                "Example: Use almond milk instead - it is dairy free and works the same way.";
+
+        return aiService.chat(prompt);
+    }
+
+
+    //HELPER METHODS
+    private Ingredient checkIngredient(Integer id){
         Ingredient ingredient = ingredientRepository.findIngredientById(id);
         if(ingredient == null) throw new ApiException("Ingredient not found"); //check ingredient
 
-        ingredientRepository.delete(ingredient);
+        return ingredient;
+    }
+
+    private Recipe checkRecipe(Integer id){
+        Recipe recipe = recipeRepository.findRecipeById(id);
+        if(recipe == null) throw new ApiException("Recipe not found"); //check recipe
+
+        return recipe;
     }
 }

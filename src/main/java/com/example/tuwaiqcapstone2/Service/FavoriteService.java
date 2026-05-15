@@ -1,6 +1,7 @@
 package com.example.tuwaiqcapstone2.Service;
 
 import com.example.tuwaiqcapstone2.Api.ApiException;
+import com.example.tuwaiqcapstone2.Enums.AllergenType;
 import com.example.tuwaiqcapstone2.Model.Favorite;
 import com.example.tuwaiqcapstone2.Model.Recipe;
 import com.example.tuwaiqcapstone2.Model.User;
@@ -19,6 +20,7 @@ public class FavoriteService {
     private final FavoriteRepository favoriteRepository;
     private final UserRepository userRepository;
     private final RecipeRepository recipeRepository;
+    private final WhatsappService whatsappService;
 
 
     //BASIC CRUD
@@ -31,6 +33,19 @@ public class FavoriteService {
         if(user == null) throw new ApiException("User not found"); //check user
         Recipe recipe = recipeRepository.findRecipeById(favorite.getRecipeId());
         if(recipe == null) throw new ApiException("Recipe not found"); //check recipe
+
+        //check allergens
+        List<AllergenType> userAllergens = user.getAllergens();
+        List<AllergenType> recipeAllergens = recipe.getAllergens();
+
+        List<AllergenType> commonAllergens = recipeAllergens.stream()
+                .filter(userAllergens::contains)
+                .toList();
+
+        if (!commonAllergens.isEmpty()) {
+            //send whatsApp warning
+            whatsappService.sendAllergenWarning(user, recipe, commonAllergens);
+        }
 
         favoriteRepository.save(favorite);
     }
