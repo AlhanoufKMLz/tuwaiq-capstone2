@@ -27,22 +27,17 @@ public class RatingService {
     }
 
     public void addRating(Rating rating){
-        User user = userRepository.findUserById(rating.getUserId());
-        if(user == null) throw new ApiException("User not found"); //check user
-        Recipe recipe = recipeRepository.findRecipeById(rating.getRecipeId());
-        if(recipe == null) throw new ApiException("Recipe not found"); //check recipe
+        checkRecipe(rating.getRecipeId());
+        checkUser(rating.getUserId());
 
         ratingRepository.save(rating);
     }
 
     public void updateRating(Integer id, Rating rating){
-        Rating oldRating = ratingRepository.findRatingById(id);
-        if(oldRating == null) throw new ApiException("Rating not found"); //check rating
+        Rating oldRating = checkRating(id);
 
-        User user = userRepository.findUserById(rating.getUserId());
-        if(user == null) throw new ApiException("User not found"); //check user
-        Recipe recipe = recipeRepository.findRecipeById(rating.getRecipeId());
-        if(recipe == null) throw new ApiException("Recipe not found"); //check recipe
+        checkRecipe(rating.getRecipeId());
+        checkUser(rating.getUserId());
 
         oldRating.setRecipeId(rating.getRecipeId());
         oldRating.setUserId(rating.getUserId());
@@ -51,9 +46,49 @@ public class RatingService {
     }
 
     public void deleteRating(Integer id){
+        Rating rating = checkRating(id);
+
+        ratingRepository.delete(rating);
+    }
+
+
+    //EXTRA ENDPOINTS
+    public List<Rating> findRatingByRecipeId(Integer recipeId){
+        checkRecipe(recipeId);
+
+        List<Rating> ratings = ratingRepository.findRatingByRecipeId(recipeId);
+
+        if(ratings.isEmpty()) throw new ApiException("No ratings found");
+
+        return ratings;
+    }
+
+    public List<Rating> findRatingByUserId(Integer userId){
+        checkUser(userId);
+
+        List<Rating> ratings = ratingRepository.findRatingByUserId(userId);
+
+        if(ratings.isEmpty()) throw new ApiException("No ratings found");
+
+        return ratings;
+    }
+
+
+    //HELPER METHODS
+    private Rating checkRating(Integer id){
         Rating rating = ratingRepository.findRatingById(id);
         if(rating == null) throw new ApiException("Rating not found"); //check rating
 
-        ratingRepository.delete(rating);
+        return rating;
+    }
+
+    private void checkRecipe(Integer id){
+        Recipe recipe = recipeRepository.findRecipeById(id);
+        if(recipe == null) throw new ApiException("Recipe not found"); //check recipe
+    }
+
+    private void checkUser(Integer id){
+        User user = userRepository.findUserById(id);
+        if(user == null) throw new ApiException("User not found"); //check user
     }
 }
