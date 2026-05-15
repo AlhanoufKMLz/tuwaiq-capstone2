@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/rating")
 @RequiredArgsConstructor
-public class RatingsController {
+public class RatingController {
 
     private final RatingService ratingService;
 
@@ -45,5 +45,17 @@ public class RatingsController {
     public ResponseEntity<?> deleteRating(@PathVariable Integer id){
         ratingService.deleteRating(id);
         return ResponseEntity.status(200).body(new ApiResponse("Rating deleted successfully"));
+    }
+
+
+    //EXTRA ENDPOINTS
+    @GetMapping("/get-recipe/{recipeId}")
+    public ResponseEntity<?> findRatingByRecipeId(@PathVariable Integer recipeId){
+        return ResponseEntity.status(200).body(ratingService.findRatingByRecipeId(recipeId));
+    }
+
+    @GetMapping("/get-user/{userId}")
+    public ResponseEntity<?> findRatingByUserId(@PathVariable Integer userId){
+        return ResponseEntity.status(200).body(ratingService.findRatingByRecipeId(userId));
     }
 }

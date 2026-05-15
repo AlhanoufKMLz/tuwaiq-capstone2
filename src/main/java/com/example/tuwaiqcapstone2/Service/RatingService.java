@@ -56,4 +56,38 @@ public class RatingService {
 
         ratingRepository.delete(rating);
     }
+
+
+    //EXTRA ENDPOINTS
+    public List<Rating> findRatingByRecipeId(Integer recipeId){
+        checkRecipe(recipeId);
+
+        List<Rating> ratings = ratingRepository.findRatingByRecipeId(recipeId);
+
+        if(ratings.isEmpty()) throw new ApiException("No ratings found");
+
+        return ratings;
+    }
+
+    public List<Rating> findRatingByUserId(Integer userId){
+        checkUser(userId);
+
+        List<Rating> ratings = ratingRepository.findRatingByUserId(userId);
+
+        if(ratings.isEmpty()) throw new ApiException("No ratings found");
+
+        return ratings;
+    }
+
+
+    //HELPER METHODS
+    public void checkRecipe(Integer id){
+        Recipe recipe = recipeRepository.findRecipeById(id);
+        if(recipe == null) throw new ApiException("Recipe not found");
+    }
+
+    public void checkUser(Integer id){
+        User user = userRepository.findUserById(id);
+        if(user == null) throw new ApiException("User not found");
+    }
 }
