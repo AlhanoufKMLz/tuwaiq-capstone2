@@ -27,22 +27,17 @@ public class RatingService {
     }
 
     public void addRating(Rating rating){
-        User user = userRepository.findUserById(rating.getUserId());
-        if(user == null) throw new ApiException("User not found"); //check user
-        Recipe recipe = recipeRepository.findRecipeById(rating.getRecipeId());
-        if(recipe == null) throw new ApiException("Recipe not found"); //check recipe
+        checkRecipe(rating.getRecipeId());
+        checkUser(rating.getUserId());
 
         ratingRepository.save(rating);
     }
 
     public void updateRating(Integer id, Rating rating){
-        Rating oldRating = ratingRepository.findRatingById(id);
-        if(oldRating == null) throw new ApiException("Rating not found"); //check rating
+        Rating oldRating = checkRating(id);
 
-        User user = userRepository.findUserById(rating.getUserId());
-        if(user == null) throw new ApiException("User not found"); //check user
-        Recipe recipe = recipeRepository.findRecipeById(rating.getRecipeId());
-        if(recipe == null) throw new ApiException("Recipe not found"); //check recipe
+        checkRecipe(rating.getRecipeId());
+        checkUser(rating.getUserId());
 
         oldRating.setRecipeId(rating.getRecipeId());
         oldRating.setUserId(rating.getUserId());
@@ -51,8 +46,7 @@ public class RatingService {
     }
 
     public void deleteRating(Integer id){
-        Rating rating = ratingRepository.findRatingById(id);
-        if(rating == null) throw new ApiException("Rating not found"); //check rating
+        Rating rating = checkRating(id);
 
         ratingRepository.delete(rating);
     }
@@ -81,13 +75,20 @@ public class RatingService {
 
 
     //HELPER METHODS
+    private Rating checkRating(Integer id){
+        Rating rating = ratingRepository.findRatingById(id);
+        if(rating == null) throw new ApiException("Rating not found"); //check rating
+
+        return rating;
+    }
+
     public void checkRecipe(Integer id){
         Recipe recipe = recipeRepository.findRecipeById(id);
-        if(recipe == null) throw new ApiException("Recipe not found");
+        if(recipe == null) throw new ApiException("Recipe not found"); //check recipe
     }
 
     public void checkUser(Integer id){
         User user = userRepository.findUserById(id);
-        if(user == null) throw new ApiException("User not found");
+        if(user == null) throw new ApiException("User not found"); //check user
     }
 }

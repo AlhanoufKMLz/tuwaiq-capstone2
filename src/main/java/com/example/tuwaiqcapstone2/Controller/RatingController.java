@@ -56,6 +56,6 @@ public class RatingController {
 
     @GetMapping("/get-user/{userId}")
     public ResponseEntity<?> findRatingByUserId(@PathVariable Integer userId){
-        return ResponseEntity.status(200).body(ratingService.findRatingByRecipeId(userId));
+        return ResponseEntity.status(200).body(ratingService.findRatingByUserId(userId));
     }
 }
