@@ -82,12 +82,12 @@ public class RatingService {
         return rating;
     }
 
-    public void checkRecipe(Integer id){
+    private void checkRecipe(Integer id){
         Recipe recipe = recipeRepository.findRecipeById(id);
         if(recipe == null) throw new ApiException("Recipe not found"); //check recipe
     }
 
-    public void checkUser(Integer id){
+    private void checkUser(Integer id){
         User user = userRepository.findUserById(id);
         if(user == null) throw new ApiException("User not found"); //check user
     }
