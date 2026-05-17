@@ -16,6 +16,7 @@ public class FollowService {
 
     private final FollowRepository followRepository;
     private final UserRepository userRepository;
+    private final EmailSenderService emailSenderService;
 
 
     //BASIC CRUD
@@ -24,8 +25,20 @@ public class FollowService {
     }
 
     public void addFollow(Follow follow){
-        checkUser(follow.getFollowerId());
-        checkUser(follow.getFollowingId());
+        //get following and follower data
+        User following = checkUser(follow.getFollowerId());
+        User follower = checkUser(follow.getFollowingId());
+
+        //send email
+        emailSenderService.sendEmail(following.getEmail(), "You have a new follower on RecipeHub!",
+                "Hi " + following.getName() + ",\n" +
+                        "\n" +
+                        follower.getName() + " started following you on RecipeHub!\n" +
+                        "\n" +
+                        "Check out their profile and recipes.\n" +
+                        "\n" +
+                        "Happy Cooking!\n" +
+                        "RecipeHub Team");
 
         followRepository.save(follow);
     }
@@ -44,8 +57,10 @@ public class FollowService {
         return follow;
     }
 
-    private void checkUser(Integer id){
+    private User checkUser(Integer id){
         User user = userRepository.findUserById(id);
-        if(user == null) throw new ApiException("User not found"); //user recipe
+        if(user == null) throw new ApiException("User not found"); //check user
+
+        return user;
     }
 }
