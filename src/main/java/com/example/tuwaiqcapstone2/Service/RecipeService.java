@@ -3,9 +3,11 @@ package com.example.tuwaiqcapstone2.Service;
 import com.example.tuwaiqcapstone2.Api.ApiException;
 import com.example.tuwaiqcapstone2.Enums.DifficultyLevel;
 import com.example.tuwaiqcapstone2.Model.Category;
+import com.example.tuwaiqcapstone2.Model.Follow;
 import com.example.tuwaiqcapstone2.Model.Recipe;
 import com.example.tuwaiqcapstone2.Model.User;
 import com.example.tuwaiqcapstone2.Repository.CategoryRepository;
+import com.example.tuwaiqcapstone2.Repository.FollowRepository;
 import com.example.tuwaiqcapstone2.Repository.RecipeRepository;
 import com.example.tuwaiqcapstone2.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,8 @@ public class RecipeService {
     private final RecipeRepository recipeRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
+    private final FollowRepository followRepository;
+    private final EmailSenderService emailSenderService;
 
     //BASIC CRUD
     public List<Recipe> getAllRecipes(){
@@ -27,10 +31,12 @@ public class RecipeService {
     }
 
     public void addRecipe(Recipe recipe){
-        checkUser(recipe.getUserId());
+        User user = checkUser(recipe.getUserId());
         checkCategory(recipe.getCategoryId());
 
         recipeRepository.save(recipe);
+
+        notifyFollowers(user, recipe);
     }
 
     public void updateRecipe(Integer id, Recipe recipe){
@@ -162,13 +168,38 @@ public class RecipeService {
         return recipe;
     }
 
-    private void checkUser(Integer id){
+    private User checkUser(Integer id){
         User user = userRepository.findUserById(id);
         if(user == null) throw new ApiException("User not found"); //check user
+
+        return user;
     }
 
     private void checkCategory(Integer id){
         Category category = categoryRepository.findCategoryById(id);
         if(category == null) throw new ApiException("Category not found"); //check category
+    }
+
+    private void notifyFollowers(User following, Recipe recipe){
+        List<Follow> follows = followRepository.findFollowByFollowingId(following.getId());
+
+        for(Follow f: follows){
+            User follower = userRepository.findUserById(f.getFollowerId());
+
+            emailSenderService.sendEmail(follower.getEmail(), "New Recipe Alert from " + following.getName() + " on RecipeHub!",
+                    "Hi " + follower.getName() + ",\n" +
+                            "\n" +
+                            following.getName() + " just added a new recipe on RecipeHub!\n" +
+                            "\n" +
+                            "Recipe: " + recipe.getName() + "\n" +
+                            "Difficulty: " + recipe.getDifficulty() + "\n" +
+                            "Cook Time: " + recipe.getCookTime() + " minutes\n" +
+                            "Servings: " + recipe.getServings() + "\n" +
+                            "\n" +
+                            "Check it out now on RecipeHub!\n" +
+                            "\n" +
+                            "Happy Cooking!\n" +
+                            "RecipeHub Team");
+        }
     }
 }
