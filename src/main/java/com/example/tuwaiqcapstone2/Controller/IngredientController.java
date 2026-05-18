@@ -53,7 +53,7 @@ public class IngredientController {
     public ResponseEntity<?> findIngredientByRecipeId(@PathVariable Integer recipeId){
         return ResponseEntity.status(200).body(ingredientService.findIngredientByRecipeId(recipeId));
     }
-    //#1
+
     @GetMapping("/get-substitute/{ingredientId}")
     public ResponseEntity<?> findIngredientSubstitute(@PathVariable Integer ingredientId){
         return ResponseEntity.status(200).body(new ApiResponse(ingredientService.findIngredientSubstitute(ingredientId)));

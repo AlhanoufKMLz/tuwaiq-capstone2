@@ -2,6 +2,7 @@ package com.example.tuwaiqcapstone2.Controller;
 
 import com.example.tuwaiqcapstone2.Api.ApiResponse;
 import com.example.tuwaiqcapstone2.Model.User;
+import com.example.tuwaiqcapstone2.Repository.UserRepository;
 import com.example.tuwaiqcapstone2.Service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -53,14 +54,20 @@ public class UserController {
     public ResponseEntity<?> findUsersSortedByMostRecipes(){
         return ResponseEntity.status(200).body(userService.findUsersSortedByMostRecipes());
     }
-    //#10
+
     @GetMapping("/sort-top")
     public ResponseEntity<?> getUsersSortedByRecipeRating(){
         return ResponseEntity.status(200).body(userService.getUsersSortedByRecipeRating());
     }
-    //#11
+
     @GetMapping("/get-mutual/{userId}")
     public ResponseEntity<?> findMutualFollows(@PathVariable Integer userId){
         return ResponseEntity.status(200).body(userService.findMutualFollows(userId));
+    }
+
+    @PostMapping("/shopping-list/{userId}")
+    public ResponseEntity<?> generateShoppingList(@PathVariable Integer userId){
+        userService.generateShoppingList(userId);
+        return ResponseEntity.status(200).body(new ApiResponse("Shopping list sent to whatsApp successfully"));
     }
 }

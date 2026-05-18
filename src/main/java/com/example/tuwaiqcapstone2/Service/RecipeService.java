@@ -33,6 +33,7 @@ public class RecipeService {
     private final CommentRepository commentRepository;
     private final AiService aiService;
     private final TranslationService translationService;
+    private final WhatsappService whatsappService;
 
 
     //BASIC CRUD
@@ -312,6 +313,12 @@ public class RecipeService {
         }
 
         return translated;
+    }
+
+    public void translateAndShare(Integer recipeId, LanguageCode language, String phoneNumber){
+        TranslateRecipeResponse recipe = translateRecipe(recipeId, language);
+
+        whatsappService.shareRecipe(recipe, phoneNumber);
     }
 
 

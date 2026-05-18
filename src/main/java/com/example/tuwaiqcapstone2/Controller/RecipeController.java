@@ -2,6 +2,7 @@ package com.example.tuwaiqcapstone2.Controller;
 
 import com.example.tuwaiqcapstone2.Api.ApiResponse;
 import com.example.tuwaiqcapstone2.DTO.GenerateRecipeRequest;
+import com.example.tuwaiqcapstone2.DTO.TranslateAndShareRecipeRequest;
 import com.example.tuwaiqcapstone2.Enums.DifficultyLevel;
 import com.example.tuwaiqcapstone2.Enums.LanguageCode;
 import com.example.tuwaiqcapstone2.Model.Recipe;
@@ -9,6 +10,7 @@ import com.example.tuwaiqcapstone2.Service.RecipeService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Request;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
@@ -77,7 +79,7 @@ public class RecipeController {
     public ResponseEntity<?> findRecipeByName(@PathVariable String keyword){
         return ResponseEntity.status(200).body(recipeService.findRecipeByName(keyword));
     }
-    //#2
+
     @GetMapping("/get-cookTime/{minutes}")
     public ResponseEntity<?> getRecipesWithCookTimeLessThan(@PathVariable Integer minutes){
         return ResponseEntity.status(200).body(recipeService.getRecipesWithCookTimeLessThan(minutes));
@@ -92,47 +94,50 @@ public class RecipeController {
     public ResponseEntity<?> findTopRatedRecipes(){
         return ResponseEntity.status(200).body(recipeService.findTopRatedRecipes());
     }
-    //#3
+
     @GetMapping("/get-top-rated-week")
     public ResponseEntity<?> findTopRatedRecipesThisWeek(){
         return ResponseEntity.status(200).body(recipeService.findTopRatedRecipesThisWeek());
     }
-    //#4
+
     @GetMapping("/get-user-favorite/{userId}")
     public ResponseEntity<?> findUserFavoritesRecipes(@PathVariable Integer userId){
         return ResponseEntity.status(200).body(recipeService.findUserFavoritesRecipes(userId));
     }
-    //#5
+
     @GetMapping("/get-similar/{recipeId}")
     public ResponseEntity<?> findSimilarRecipes(@PathVariable Integer recipeId){
         return ResponseEntity.status(200).body(recipeService.findSimilarRecipes(recipeId));
     }
-    //#6
+
     @GetMapping("/get-safe-user/{userId}")
     public ResponseEntity<?> findSafeRecipesForUser(@PathVariable Integer userId){
         return ResponseEntity.status(200).body(recipeService.findSafeRecipesForUser(userId));
     }
-    //#7
+
     @GetMapping("/get-feed/{userId}")
     public ResponseEntity<?> findRecipesFeed(@PathVariable Integer userId){
         return ResponseEntity.status(200).body(recipeService.findRecipesFeed(userId));
     }
-    //#8
+
     @GetMapping("/details/{recipeId}")
     public ResponseEntity<?> getRecipeDetails(@PathVariable Integer recipeId){
         return ResponseEntity.status(200).body(recipeService.getRecipeDetails(recipeId));
     }
-    //#12
+
     @GetMapping("/nutrition-analyze/{recipeId}")
     public ResponseEntity<?> analyzeRecipeNutrition(@PathVariable Integer recipeId) {
         return ResponseEntity.status(200).body(recipeService.analyzeRecipeNutrition(recipeId));
     }
-    //#13
+
     @PostMapping("/generate")
-    public ResponseEntity<?> generateRecipe(@RequestBody GenerateRecipeRequest request){
+    public ResponseEntity<?> generateRecipe(@RequestBody GenerateRecipeRequest request, Errors errors){
+        if(errors.hasErrors())
+            return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
+
         return ResponseEntity.status(200).body(recipeService.generateRecipe(request));
     }
-    //#14
+
     @PostMapping("/convert-serving/{recipeId}/{serving}")
     public ResponseEntity<?> convertServings(@PathVariable Integer recipeId, @PathVariable Integer serving){
         return ResponseEntity.status(200).body(recipeService.convertServings(recipeId, serving));
@@ -141,5 +146,14 @@ public class RecipeController {
     @PostMapping("/translate/{recipeId}/{language}")
     public ResponseEntity<?> translateRecipe(@PathVariable Integer recipeId, @PathVariable LanguageCode language){
         return ResponseEntity.status(200).body(recipeService.translateRecipe(recipeId, language));
+    }
+
+    @PostMapping("/translate-share")
+    public ResponseEntity<?> translateAndShare(@RequestBody @Valid TranslateAndShareRecipeRequest request, Errors errors){
+        if(errors.hasErrors())
+            return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
+
+        recipeService.translateAndShare(request.getRecipeId(), request.getLanguage(), request.getPhoneNumber());
+        return ResponseEntity.status(200).body(new ApiResponse("Recipe shared successfully"));
     }
 }
