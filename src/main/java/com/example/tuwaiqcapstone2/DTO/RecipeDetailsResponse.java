@@ -7,6 +7,7 @@ import com.example.tuwaiqcapstone2.Model.RecipeStep;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Map;
 
 @Data
 public class RecipeDetailsResponse {
@@ -14,5 +15,5 @@ public class RecipeDetailsResponse {
     private List<Ingredient> ingredients;
     private List<RecipeStep> steps;
     private Double averageRating;
-    private List<Comment> comments;
+    List<Comment> comments;
 }

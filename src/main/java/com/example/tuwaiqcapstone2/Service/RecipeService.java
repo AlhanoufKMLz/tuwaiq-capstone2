@@ -1,11 +1,10 @@
 package com.example.tuwaiqcapstone2.Service;
 
 import com.example.tuwaiqcapstone2.Api.ApiException;
-import com.example.tuwaiqcapstone2.DTO.GenerateRecipeRequest;
-import com.example.tuwaiqcapstone2.DTO.GenerateRecipeResponse;
-import com.example.tuwaiqcapstone2.DTO.NutritionAnalysisResponse;
-import com.example.tuwaiqcapstone2.DTO.RecipeDetailsResponse;
+import com.example.tuwaiqcapstone2.DTO.*;
+import com.example.tuwaiqcapstone2.Enums.AllergenType;
 import com.example.tuwaiqcapstone2.Enums.DifficultyLevel;
+import com.example.tuwaiqcapstone2.Enums.LanguageCode;
 import com.example.tuwaiqcapstone2.Enums.UnitType;
 import com.example.tuwaiqcapstone2.Model.*;
 import com.example.tuwaiqcapstone2.Repository.*;
@@ -14,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,6 +32,7 @@ public class RecipeService {
     private final RatingRepository ratingRepository;
     private final CommentRepository commentRepository;
     private final AiService aiService;
+    private final TranslationService translationService;
 
 
     //BASIC CRUD
@@ -226,7 +227,7 @@ public class RecipeService {
         }
     }
 
-    public GenerateRecipeResponse GenerateRecipe(GenerateRecipeRequest request){
+    public GenerateRecipeResponse generateRecipe(GenerateRecipeRequest request){
         //check if the user allows extra ingredients
         String extra = request.getAllowExtraIngredients()
                 ? "You can add extra ingredients if needed to complete the recipe."
@@ -254,7 +255,7 @@ public class RecipeService {
         }
     }
 
-    public RecipeDetailsResponse ConvertServings(Integer recipeId, Integer newServings){
+    public RecipeDetailsResponse convertServings(Integer recipeId, Integer newServings){
         RecipeDetailsResponse recipeDetails = getRecipeDetails(recipeId);
 
         String prompt = "Given this recipe: " + recipeDetailsToString(recipeDetails) +
@@ -271,6 +272,46 @@ public class RecipeService {
         } catch (JsonProcessingException e){
             throw new ApiException("Failed to convert recipe");
         }
+    }
+
+    public TranslateRecipeResponse translateRecipe(Integer recipeId, LanguageCode language){
+        RecipeDetailsResponse original = getRecipeDetails(recipeId);
+
+        TranslateRecipeResponse translated = new TranslateRecipeResponse();
+        translated.setAllergens(new ArrayList<>());
+        translated.setIngredients(new ArrayList<>());
+        translated.setSteps(new ArrayList<>());
+
+        translated.setRecipeName(translationService.translate(original.getRecipe().getName(), language));
+        translated.setDescription(translationService.translate(original.getRecipe().getDescription(), language));
+        translated.setCookTime(original.getRecipe().getCookTime());
+        translated.setDifficulty(translationService.translate(original.getRecipe().getDifficulty().toString(), language));
+        translated.setServings(original.getRecipe().getServings());
+
+        //translate allergens
+        for(AllergenType a: original.getRecipe().getAllergens()){
+            translated.getAllergens().add(translationService.translate(a.toString(), language));
+        }
+
+        //translate ingredients
+        for (Ingredient i: original.getIngredients()){
+            IngredientResponse ingredient = new IngredientResponse();
+            ingredient.setName(translationService.translate(i.getName(), language));
+            ingredient.setAmount(i.getAmount());
+            ingredient.setUnit(translationService.translate(i.getUnit().toString(), language));
+
+            translated.getIngredients().add(ingredient);
+        }
+
+        //translate steps
+        for (RecipeStep s: original.getSteps()){
+            RecipeStepResponse step = new RecipeStepResponse();
+            step.setStepNumber(s.getStepNumber());
+            step.setInstruction(translationService.translate(s.getInstruction(), language));
+            translated.getSteps().add(step);
+        }
+
+        return translated;
     }
 
 

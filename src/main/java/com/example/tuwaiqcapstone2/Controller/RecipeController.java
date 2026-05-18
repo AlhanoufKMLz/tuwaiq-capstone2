@@ -3,6 +3,7 @@ package com.example.tuwaiqcapstone2.Controller;
 import com.example.tuwaiqcapstone2.Api.ApiResponse;
 import com.example.tuwaiqcapstone2.DTO.GenerateRecipeRequest;
 import com.example.tuwaiqcapstone2.Enums.DifficultyLevel;
+import com.example.tuwaiqcapstone2.Enums.LanguageCode;
 import com.example.tuwaiqcapstone2.Model.Recipe;
 import com.example.tuwaiqcapstone2.Service.RecipeService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -128,12 +129,17 @@ public class RecipeController {
     }
     //#13
     @PostMapping("/generate")
-    public ResponseEntity<?> GenerateRecipe(@RequestBody GenerateRecipeRequest request){
-        return ResponseEntity.status(200).body(recipeService.GenerateRecipe(request));
+    public ResponseEntity<?> generateRecipe(@RequestBody GenerateRecipeRequest request){
+        return ResponseEntity.status(200).body(recipeService.generateRecipe(request));
     }
     //#14
     @PostMapping("/convert-serving/{recipeId}/{serving}")
-    public ResponseEntity<?> ConvertServings(@PathVariable Integer recipeId, @PathVariable Integer serving){
-        return ResponseEntity.status(200).body(recipeService.ConvertServings(recipeId, serving));
+    public ResponseEntity<?> convertServings(@PathVariable Integer recipeId, @PathVariable Integer serving){
+        return ResponseEntity.status(200).body(recipeService.convertServings(recipeId, serving));
+    }
+
+    @PostMapping("/translate/{recipeId}/{language}")
+    public ResponseEntity<?> translateRecipe(@PathVariable Integer recipeId, @PathVariable LanguageCode language){
+        return ResponseEntity.status(200).body(recipeService.translateRecipe(recipeId, language));
     }
 }
