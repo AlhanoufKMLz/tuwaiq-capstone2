@@ -1,14 +1,22 @@
 package com.example.tuwaiqcapstone2.Service;
 
 import com.example.tuwaiqcapstone2.Api.ApiException;
+import com.example.tuwaiqcapstone2.DTO.GenerateRecipeRequest;
+import com.example.tuwaiqcapstone2.DTO.GenerateRecipeResponse;
+import com.example.tuwaiqcapstone2.DTO.NutritionAnalysisResponse;
 import com.example.tuwaiqcapstone2.DTO.RecipeDetailsResponse;
 import com.example.tuwaiqcapstone2.Enums.DifficultyLevel;
+import com.example.tuwaiqcapstone2.Enums.UnitType;
 import com.example.tuwaiqcapstone2.Model.*;
 import com.example.tuwaiqcapstone2.Repository.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +31,7 @@ public class RecipeService {
     private final RecipeStepRepository recipeStepRepository;
     private final RatingRepository ratingRepository;
     private final CommentRepository commentRepository;
+    private final AiService aiService;
 
 
     //BASIC CRUD
@@ -193,6 +202,77 @@ public class RecipeService {
         return response;
     }
 
+    public NutritionAnalysisResponse analyzeRecipeNutrition(Integer recipeId) {
+        checkRecipe(recipeId);
+        List<Ingredient> ingredients = checkIngredient(recipeId);
+
+        //convert the ingredients into string
+        String ingredientsList = ingredients.stream()
+                .map(i -> i.getAmount() + " " + i.getUnit() + " " + i.getName())
+                .collect(Collectors.joining(", "));
+
+        //Send the ingredient to AI
+        String prompt = "Analyze the nutrition for a recipe with these ingredients: " + ingredientsList +
+                ". Return ONLY a JSON object with these exact keys: calories, protein, carbs, fats, sugar, sodium. " +
+                "All values must be numbers. Example: {\"calories\": 450, \"protein\": 20.5, \"carbs\": 35.0, \"fats\": 15.0, \"sugar\": 8.0, \"sodium\": 320.0}";
+
+        String response = aiService.chat(prompt);
+        //convert json response into NutritionAnalysis object
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            return objectMapper.readValue(response, NutritionAnalysisResponse.class);
+        } catch (Exception e) {
+            throw new ApiException("Failed to parse nutrition analysis");
+        }
+    }
+
+    public GenerateRecipeResponse GenerateRecipe(GenerateRecipeRequest request){
+        //check if the user allows extra ingredients
+        String extra = request.getAllowExtraIngredients()
+                ? "You can add extra ingredients if needed to complete the recipe."
+                : "Use ONLY the provided ingredients, do not add anything else.";
+
+        //send the request to AI
+        String prompt = "Given these ingredients: " + request.getIngredients() +
+                ". " + extra +
+                " Generate a complete recipe. Return ONLY a JSON object with these exact keys: " +
+                "name, description, cookTime (number in minutes), difficulty (EASY, MEDIUM, or HARD), servings (number), " +
+                "ingredients (array of objects with: name, amount (number), unit must be one of: " + Arrays.toString(UnitType.values()) + "), " +
+                "steps (array of objects with: stepNumber, instruction). " +
+                "Example: {\"name\": \"Pasta\", \"description\": \"Delicious\", \"cookTime\": 30, \"difficulty\": \"EASY\", \"servings\": 4, " +
+                "\"ingredients\": [{\"name\": \"pasta\", \"amount\": 400, \"unit\": \"GRAM\"}], " +
+                "\"steps\": [{\"stepNumber\": 1, \"instruction\": \"Boil water\"}]}";
+
+        String response = aiService.chat(prompt);
+
+        //convert json response into GenerateRecipeResponse object
+        ObjectMapper objectMapper = new ObjectMapper();
+        try{
+            return objectMapper.readValue(response, GenerateRecipeResponse.class);
+        } catch (Exception e) {
+            throw new ApiException("Failed to generate recipe");
+        }
+    }
+
+    public RecipeDetailsResponse ConvertServings(Integer recipeId, Integer newServings){
+        RecipeDetailsResponse recipeDetails = getRecipeDetails(recipeId);
+
+        String prompt = "Given this recipe: " + recipeDetailsToString(recipeDetails) +
+                ". Convert all ingredient amounts to serve " + newServings + " people instead of " + recipeDetails.getRecipe().getServings() + "." +
+                " Return ONLY the same JSON structure with updated ingredient amounts and servings number. No extra text.";
+
+        String response = aiService.chat(prompt);
+        System.out.println(response);
+
+        //convert json response into GenerateRecipeResponse object
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            return objectMapper.readValue(response, RecipeDetailsResponse.class);
+        } catch (JsonProcessingException e){
+            throw new ApiException("Failed to convert recipe");
+        }
+    }
+
 
     //HELPER METHODS
     private Recipe checkRecipe(Integer id){
@@ -234,5 +314,48 @@ public class RecipeService {
                             "Happy Cooking!\n" +
                             "RecipeHub Team");
         }
+    }
+
+    private List<Ingredient> checkIngredient(Integer recipeId){
+        List<Ingredient> ingredients = ingredientRepository.findIngredientByRecipeId(recipeId);
+
+        if(ingredients.isEmpty()) throw new ApiException("No ingredients found");
+
+        return ingredients;
+    }
+
+    private String recipeDetailsToString(RecipeDetailsResponse details) {
+        Recipe r = details.getRecipe();
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("{");
+        sb.append("\"recipe\": {");
+        sb.append("\"name\": \"").append(r.getName()).append("\", ");
+        sb.append("\"description\": \"").append(r.getDescription()).append("\", ");
+        sb.append("\"cookTime\": ").append(r.getCookTime()).append(", ");
+        sb.append("\"difficulty\": \"").append(r.getDifficulty()).append("\", ");
+        sb.append("\"servings\": ").append(r.getServings());
+        sb.append("}, ");
+
+        sb.append("\"ingredients\": [");
+        for (int i = 0; i < details.getIngredients().size(); i++) {
+            Ingredient ing = details.getIngredients().get(i);
+            sb.append("{\"name\": \"").append(ing.getName()).append("\", ");
+            sb.append("\"amount\": ").append(ing.getAmount()).append(", ");
+            sb.append("\"unit\": \"").append(ing.getUnit()).append("\"}");
+            if (i < details.getIngredients().size() - 1) sb.append(", ");
+        }
+        sb.append("], ");
+
+        sb.append("\"steps\": [");
+        for (int i = 0; i < details.getSteps().size(); i++) {
+            RecipeStep step = details.getSteps().get(i);
+            sb.append("{\"stepNumber\": ").append(step.getStepNumber()).append(", ");
+            sb.append("\"instruction\": \"").append(step.getInstruction()).append("\"}");
+            if (i < details.getSteps().size() - 1) sb.append(", ");
+        }
+        sb.append("]}");
+
+        return sb.toString();
     }
 }

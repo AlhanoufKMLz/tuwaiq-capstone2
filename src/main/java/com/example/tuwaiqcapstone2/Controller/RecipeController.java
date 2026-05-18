@@ -1,9 +1,11 @@
 package com.example.tuwaiqcapstone2.Controller;
 
 import com.example.tuwaiqcapstone2.Api.ApiResponse;
+import com.example.tuwaiqcapstone2.DTO.GenerateRecipeRequest;
 import com.example.tuwaiqcapstone2.Enums.DifficultyLevel;
 import com.example.tuwaiqcapstone2.Model.Recipe;
 import com.example.tuwaiqcapstone2.Service.RecipeService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -74,7 +76,7 @@ public class RecipeController {
     public ResponseEntity<?> findRecipeByName(@PathVariable String keyword){
         return ResponseEntity.status(200).body(recipeService.findRecipeByName(keyword));
     }
-
+    //#2
     @GetMapping("/get-cookTime/{minutes}")
     public ResponseEntity<?> getRecipesWithCookTimeLessThan(@PathVariable Integer minutes){
         return ResponseEntity.status(200).body(recipeService.getRecipesWithCookTimeLessThan(minutes));
@@ -89,34 +91,49 @@ public class RecipeController {
     public ResponseEntity<?> findTopRatedRecipes(){
         return ResponseEntity.status(200).body(recipeService.findTopRatedRecipes());
     }
-
+    //#3
     @GetMapping("/get-top-rated-week")
     public ResponseEntity<?> findTopRatedRecipesThisWeek(){
         return ResponseEntity.status(200).body(recipeService.findTopRatedRecipesThisWeek());
     }
-
+    //#4
     @GetMapping("/get-user-favorite/{userId}")
     public ResponseEntity<?> findUserFavoritesRecipes(@PathVariable Integer userId){
         return ResponseEntity.status(200).body(recipeService.findUserFavoritesRecipes(userId));
     }
-
+    //#5
     @GetMapping("/get-similar/{recipeId}")
     public ResponseEntity<?> findSimilarRecipes(@PathVariable Integer recipeId){
         return ResponseEntity.status(200).body(recipeService.findSimilarRecipes(recipeId));
     }
-
+    //#6
     @GetMapping("/get-safe-user/{userId}")
     public ResponseEntity<?> findSafeRecipesForUser(@PathVariable Integer userId){
         return ResponseEntity.status(200).body(recipeService.findSafeRecipesForUser(userId));
     }
-
+    //#7
     @GetMapping("/get-feed/{userId}")
     public ResponseEntity<?> findRecipesFeed(@PathVariable Integer userId){
         return ResponseEntity.status(200).body(recipeService.findRecipesFeed(userId));
     }
-
+    //#8
     @GetMapping("/details/{recipeId}")
     public ResponseEntity<?> getRecipeDetails(@PathVariable Integer recipeId){
         return ResponseEntity.status(200).body(recipeService.getRecipeDetails(recipeId));
+    }
+    //#12
+    @GetMapping("/nutrition-analyze/{recipeId}")
+    public ResponseEntity<?> analyzeRecipeNutrition(@PathVariable Integer recipeId) {
+        return ResponseEntity.status(200).body(recipeService.analyzeRecipeNutrition(recipeId));
+    }
+    //#13
+    @PostMapping("/generate")
+    public ResponseEntity<?> GenerateRecipe(@RequestBody GenerateRecipeRequest request){
+        return ResponseEntity.status(200).body(recipeService.GenerateRecipe(request));
+    }
+    //#14
+    @PostMapping("/convert-serving/{recipeId}/{serving}")
+    public ResponseEntity<?> ConvertServings(@PathVariable Integer recipeId, @PathVariable Integer serving){
+        return ResponseEntity.status(200).body(recipeService.ConvertServings(recipeId, serving));
     }
 }

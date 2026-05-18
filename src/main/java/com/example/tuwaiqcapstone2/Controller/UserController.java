@@ -53,12 +53,12 @@ public class UserController {
     public ResponseEntity<?> findUsersSortedByMostRecipes(){
         return ResponseEntity.status(200).body(userService.findUsersSortedByMostRecipes());
     }
-
+    //#10
     @GetMapping("/sort-top")
     public ResponseEntity<?> getUsersSortedByRecipeRating(){
         return ResponseEntity.status(200).body(userService.getUsersSortedByRecipeRating());
     }
-
+    //#11
     @GetMapping("/get-mutual/{userId}")
     public ResponseEntity<?> findMutualFollows(@PathVariable Integer userId){
         return ResponseEntity.status(200).body(userService.findMutualFollows(userId));

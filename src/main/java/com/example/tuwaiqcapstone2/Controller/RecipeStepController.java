@@ -54,7 +54,7 @@ public class RecipeStepController {
     public ResponseEntity<?> findRecipeStepByRecipeId(@PathVariable Integer recipeId){
         return ResponseEntity.status(200).body(recipeStepService.findRecipeStepByRecipeId(recipeId));
     }
-
+    //#9
     @PostMapping("/generate/{recipeId}")
     public ResponseEntity<?> generateRecipeSteps(@PathVariable Integer recipeId, @RequestBody @Valid RecipeStepsRequest request) {
         recipeStepService.generateRecipeSteps(recipeId, request.getInstructions());
