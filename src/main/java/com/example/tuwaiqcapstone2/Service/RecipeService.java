@@ -1,15 +1,10 @@
 package com.example.tuwaiqcapstone2.Service;
 
 import com.example.tuwaiqcapstone2.Api.ApiException;
+import com.example.tuwaiqcapstone2.DTO.RecipeDetailsResponse;
 import com.example.tuwaiqcapstone2.Enums.DifficultyLevel;
-import com.example.tuwaiqcapstone2.Model.Category;
-import com.example.tuwaiqcapstone2.Model.Follow;
-import com.example.tuwaiqcapstone2.Model.Recipe;
-import com.example.tuwaiqcapstone2.Model.User;
-import com.example.tuwaiqcapstone2.Repository.CategoryRepository;
-import com.example.tuwaiqcapstone2.Repository.FollowRepository;
-import com.example.tuwaiqcapstone2.Repository.RecipeRepository;
-import com.example.tuwaiqcapstone2.Repository.UserRepository;
+import com.example.tuwaiqcapstone2.Model.*;
+import com.example.tuwaiqcapstone2.Repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +19,11 @@ public class RecipeService {
     private final CategoryRepository categoryRepository;
     private final FollowRepository followRepository;
     private final EmailSenderService emailSenderService;
+    private final IngredientRepository ingredientRepository;
+    private final RecipeStepRepository recipeStepRepository;
+    private final RatingRepository ratingRepository;
+    private final CommentRepository commentRepository;
+
 
     //BASIC CRUD
     public List<Recipe> getAllRecipes(){
@@ -116,8 +116,8 @@ public class RecipeService {
         return recipes;
     }
 
-    public List<Recipe> findRecipeWithMostComments(){
-        List<Recipe> recipes = recipeRepository.findRecipeWithMostComments();
+    public List<Recipe> findRecipesSortedByMostComments(){
+        List<Recipe> recipes = recipeRepository.findRecipesSortedByMostComments();
 
         if(recipes.isEmpty()) throw new ApiException("No recipes found");
 
@@ -158,6 +158,39 @@ public class RecipeService {
         if(recipes.isEmpty()) throw new ApiException("No recipes found");
 
         return recipes;
+    }
+
+    public List<Recipe> findSafeRecipesForUser(Integer userId){
+        checkUser(userId);
+
+        List<Recipe> recipes = recipeRepository.findSafeRecipesForUser(userId);
+
+        if(recipes.isEmpty()) throw new ApiException("No recipes found");
+
+        return recipes;
+    }
+
+    public List<Recipe> findRecipesFeed(Integer userId){
+        checkUser(userId);
+
+        List<Recipe> recipes = recipeRepository.findRecipesFeed(userId);
+
+        if(recipes.isEmpty()) throw new ApiException("No recipes found");
+
+        return recipes;
+    }
+
+    public RecipeDetailsResponse getRecipeDetails(Integer recipeId) {
+        Recipe recipe = checkRecipe(recipeId);
+
+        RecipeDetailsResponse response = new RecipeDetailsResponse();
+        response.setRecipe(recipe);
+        response.setIngredients(ingredientRepository.findIngredientByRecipeId(recipeId));
+        response.setSteps(recipeStepRepository.findRecipeStepsByRecipeIdOrderByStepNumberAsc(recipeId));
+        response.setAverageRating(ratingRepository.findAverageRatingByRecipeId(recipeId));
+        response.setComments(commentRepository.findCommentByRecipeId(recipeId));
+
+        return response;
     }
 
 

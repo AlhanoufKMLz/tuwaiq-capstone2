@@ -64,17 +64,26 @@ public class FavoriteService {
         favoriteRepository.delete(favorite);
     }
 
+
     //EXTRA ENDPOINTS
     public List<Favorite> findFavoriteByRecipeId(Integer recipeId){
         checkRecipe(recipeId);
 
-        return favoriteRepository.findFavoriteByRecipeId(recipeId);
+        List<Favorite> favorites = favoriteRepository.findFavoriteByRecipeId(recipeId);
+
+        if(favorites.isEmpty()) throw new ApiException("No favorites found");
+
+        return favorites;
     }
 
     public List<Favorite> findFavoriteByUserId(Integer userId){
         checkRecipe(userId);
 
-        return favoriteRepository.findFavoriteByUserId(userId);
+        List<Favorite> favorites = favoriteRepository.findFavoriteByUserId(userId);
+
+        if(favorites.isEmpty()) throw new ApiException("No favorites found");
+
+        return favorites;
     }
 
 

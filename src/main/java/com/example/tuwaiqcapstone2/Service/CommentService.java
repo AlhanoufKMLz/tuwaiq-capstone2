@@ -38,8 +38,8 @@ public class CommentService {
         checkRecipe(comment.getRecipeId());
 
         oldComment.setUserId(comment.getUserId());
-        oldComment.setUserId(comment.getUserId());
         oldComment.setRecipeId(comment.getRecipeId());
+        oldComment.setContent(comment.getContent());
         commentRepository.save(oldComment);
     }
 
@@ -65,7 +65,8 @@ public class CommentService {
 
         if(comments.isEmpty()) throw new ApiException("No comments found");
 
-        return comments;    }
+        return comments;
+    }
 
 
     //HELPER METHODS

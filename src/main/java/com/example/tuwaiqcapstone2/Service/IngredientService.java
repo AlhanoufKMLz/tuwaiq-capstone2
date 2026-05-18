@@ -75,7 +75,11 @@ public class IngredientService {
     public List<Ingredient> findIngredientByRecipeId(Integer recipeId){
         checkRecipe(recipeId);
 
-        return ingredientRepository.findIngredientByRecipeId(recipeId);
+        List<Ingredient> ingredients = ingredientRepository.findIngredientByRecipeId(recipeId);
+
+        if(ingredients.isEmpty()) throw new ApiException("No ingredients found");
+
+        return ingredients;
     }
 
     public String findIngredientSubstitute(Integer ingredientId) {

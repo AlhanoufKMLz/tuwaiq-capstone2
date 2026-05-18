@@ -52,7 +52,11 @@ public class RecipeStepService {
     public List<RecipeStep> findRecipeStepByRecipeId(Integer recipeId){
         checkRecipe(recipeId);
 
-        return recipeStepRepository.findRecipeStepByRecipeId(recipeId);
+        List<RecipeStep> recipeSteps = recipeStepRepository.findRecipeStepByRecipeId(recipeId);
+
+        if(recipeSteps.isEmpty()) throw new ApiException("No recipe steps found");
+
+        return recipeSteps;
     }
 
     public void generateRecipeSteps(Integer recipeId, String instructions){

@@ -49,8 +49,18 @@ public class UserController {
 
 
     //EXTRA ENDPOINTS
-    @DeleteMapping("/get-most-recipe")
-    public ResponseEntity<?> findUserWithMostRecipes(){
-        return ResponseEntity.status(200).body(userService.findUserWithMostRecipes());
+    @GetMapping("/get-most-recipe")
+    public ResponseEntity<?> findUsersSortedByMostRecipes(){
+        return ResponseEntity.status(200).body(userService.findUsersSortedByMostRecipes());
+    }
+
+    @GetMapping("/sort-top")
+    public ResponseEntity<?> getUsersSortedByRecipeRating(){
+        return ResponseEntity.status(200).body(userService.getUsersSortedByRecipeRating());
+    }
+
+    @GetMapping("/get-mutual/{userId}")
+    public ResponseEntity<?> findMutualFollows(@PathVariable Integer userId){
+        return ResponseEntity.status(200).body(userService.findMutualFollows(userId));
     }
 }

@@ -12,4 +12,6 @@ public interface RecipeStepRepository extends JpaRepository<RecipeStep, Integer>
     RecipeStep findRecipeStepById(Integer id);
 
     List<RecipeStep> findRecipeStepByRecipeId(Integer recipeId);
+
+    List<RecipeStep> findRecipeStepsByRecipeIdOrderByStepNumberAsc(Integer recipeId);
 }

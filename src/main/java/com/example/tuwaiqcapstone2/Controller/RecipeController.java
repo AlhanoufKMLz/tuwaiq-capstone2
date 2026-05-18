@@ -81,8 +81,8 @@ public class RecipeController {
     }
 
     @GetMapping("/get-most-comment")
-    public ResponseEntity<?> findRecipeWithMostComments(){
-        return ResponseEntity.status(200).body(recipeService.findRecipeWithMostComments());
+    public ResponseEntity<?> findRecipesSortedByMostComments(){
+        return ResponseEntity.status(200).body(recipeService.findRecipesSortedByMostComments());
     }
 
     @GetMapping("/get-top-rated")
@@ -105,4 +105,18 @@ public class RecipeController {
         return ResponseEntity.status(200).body(recipeService.findSimilarRecipes(recipeId));
     }
 
+    @GetMapping("/get-safe-user/{userId}")
+    public ResponseEntity<?> findSafeRecipesForUser(@PathVariable Integer userId){
+        return ResponseEntity.status(200).body(recipeService.findSafeRecipesForUser(userId));
+    }
+
+    @GetMapping("/get-feed/{userId}")
+    public ResponseEntity<?> findRecipesFeed(@PathVariable Integer userId){
+        return ResponseEntity.status(200).body(recipeService.findRecipesFeed(userId));
+    }
+
+    @GetMapping("/details/{recipeId}")
+    public ResponseEntity<?> getRecipeDetails(@PathVariable Integer recipeId){
+        return ResponseEntity.status(200).body(recipeService.getRecipeDetails(recipeId));
+    }
 }

@@ -25,8 +25,8 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
     @Query("SELECT r FROM Recipe r WHERE (r.cookTime <  ?1)")
     List<Recipe> findRecipesWithCookTimeLessThan(Integer minutes);
 
-    @Query(value = "SELECT * FROM recipe r WHERE r.id = (SELECT c.recipe_id FROM comment c GROUP BY c.recipe_id ORDER BY count(c) DESC LIMIT 1)", nativeQuery = true)
-    List<Recipe> findRecipeWithMostComments();
+    @Query("SELECT r FROM Recipe r WHERE r.id IN (SELECT c.recipeId FROM Comment c GROUP BY c.recipeId) ORDER BY (SELECT COUNT(c2) FROM Comment c2 WHERE c2.recipeId = r.id) DESC")
+    List<Recipe> findRecipesSortedByMostComments();
 
     @Query("SELECT r FROM Recipe r WHERE r.id IN (SELECT rt.recipeId FROM Rating rt WHERE rt.ratingValue > (SELECT AVG(rt2.ratingValue) FROM Rating rt2))")
     List<Recipe> findTopRatedRecipes();
@@ -39,4 +39,10 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
 
     @Query("SELECT r FROM Recipe r WHERE r.difficulty = (SELECT r1.difficulty FROM  Recipe r1 WHERE r1.id = ?1) AND r.categoryId = (SELECT r2.categoryId FROM  Recipe r2 WHERE r2.id = ?1)")
     List<Recipe> findSimilarRecipes(Integer recipeId); //based on difficulty and category
+
+    @Query(value = "SELECT * FROM recipe r WHERE NOT EXISTS (SELECT 1 FROM recipe_allergens ra WHERE ra.recipe_id = r.id AND ra.allergen IN (SELECT ua.allergen FROM user_allergens ua WHERE ua.user_id = ?1))", nativeQuery = true)
+    List<Recipe> findSafeRecipesForUser(Integer userId);
+
+    @Query("SELECT r FROM Recipe r WHERE r.userId IN (SELECT f.followingId FROM Follow f WHERE f.followerId = ?1)")
+    List<Recipe> findRecipesFeed(Integer userId); //get all recipes for user's followings
 }

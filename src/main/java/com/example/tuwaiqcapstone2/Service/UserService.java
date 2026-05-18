@@ -48,11 +48,36 @@ public class UserService {
 
 
     //EXTRA ENDPOINTS
-    public User findUserWithMostRecipes(){
-        User user = userRepository.findUserWithMostRecipes();
+    public List<User> findUsersSortedByMostRecipes(){
+        List<User> users = userRepository.findUsersSortedByMostRecipes();
 
-        if(user == null) throw new ApiException("User not found");
+        if(users.isEmpty()) throw new ApiException("No users found");
 
-        return user;
+        return users;
+    }
+
+    public List<User> getUsersSortedByRecipeRating(){
+        List<User> sortedUsers = userRepository.getUsersSortedByRecipeRating();
+
+        if(sortedUsers.isEmpty()) throw new ApiException("No users found");
+
+        return sortedUsers;
+    }
+
+    public List<User> findMutualFollows(Integer userId){
+        checkUser(userId);
+
+        List<User> users = userRepository.findMutualFollows(userId);
+
+        if(users.isEmpty()) throw new ApiException("No users found");
+
+        return users;
+    }
+
+
+    //HELPER METHOD
+    private void checkUser(Integer id){
+        User user = userRepository.findUserById(id);
+        if(user == null) throw new ApiException("User not found"); //check user
     }
 }
