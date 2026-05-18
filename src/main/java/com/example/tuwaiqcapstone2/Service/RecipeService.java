@@ -264,7 +264,6 @@ public class RecipeService {
                 " Return ONLY the same JSON structure with updated ingredient amounts and servings number. No extra text.";
 
         String response = aiService.chat(prompt);
-        System.out.println(response);
 
         //convert json response into GenerateRecipeResponse object
         ObjectMapper objectMapper = new ObjectMapper();

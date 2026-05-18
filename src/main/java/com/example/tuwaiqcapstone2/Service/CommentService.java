@@ -37,8 +37,6 @@ public class CommentService {
         checkUser(comment.getUserId());
         checkRecipe(comment.getRecipeId());
 
-        oldComment.setUserId(comment.getUserId());
-        oldComment.setRecipeId(comment.getRecipeId());
         oldComment.setContent(comment.getContent());
         commentRepository.save(oldComment);
     }
@@ -60,7 +58,7 @@ public class CommentService {
     }
 
     public List<Comment> findCommentByUserId(Integer userId){
-        checkRecipe(userId);
+        checkUser(userId);
         List<Comment> comments = commentRepository.findCommentByUserId(userId);
 
         if(comments.isEmpty()) throw new ApiException("No comments found");

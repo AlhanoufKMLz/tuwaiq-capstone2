@@ -39,8 +39,6 @@ public class RatingService {
         checkRecipe(rating.getRecipeId());
         checkUser(rating.getUserId());
 
-        oldRating.setRecipeId(rating.getRecipeId());
-        oldRating.setUserId(rating.getUserId());
         oldRating.setRatingValue(rating.getRatingValue());
         ratingRepository.save(oldRating);
     }

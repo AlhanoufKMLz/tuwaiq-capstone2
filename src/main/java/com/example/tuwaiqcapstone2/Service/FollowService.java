@@ -26,8 +26,8 @@ public class FollowService {
 
     public void addFollow(Follow follow){
         //get following and follower data
-        User following = checkUser(follow.getFollowerId());
-        User follower = checkUser(follow.getFollowingId());
+        User following = checkUser(follow.getFollowingId());
+        User follower = checkUser(follow.getFollowerId());
 
         //send email
         emailSenderService.sendEmail(following.getEmail(), "You have a new follower on RecipeHub!",

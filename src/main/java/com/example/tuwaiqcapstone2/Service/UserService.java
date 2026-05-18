@@ -1,9 +1,11 @@
 package com.example.tuwaiqcapstone2.Service;
 
 import com.example.tuwaiqcapstone2.Api.ApiException;
+import com.example.tuwaiqcapstone2.Model.Follow;
 import com.example.tuwaiqcapstone2.Model.Ingredient;
 import com.example.tuwaiqcapstone2.Model.Recipe;
 import com.example.tuwaiqcapstone2.Model.User;
+import com.example.tuwaiqcapstone2.Repository.FollowRepository;
 import com.example.tuwaiqcapstone2.Repository.IngredientRepository;
 import com.example.tuwaiqcapstone2.Repository.RecipeRepository;
 import com.example.tuwaiqcapstone2.Repository.UserRepository;
@@ -11,15 +13,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
+    private final FollowRepository followRepository;
     private final RecipeRepository recipeRepository;
     private final IngredientRepository ingredientRepository;
     private final WhatsappService whatsappService;
@@ -69,6 +70,36 @@ public class UserService {
         if(sortedUsers.isEmpty()) throw new ApiException("No users found");
 
         return sortedUsers;
+    }
+
+    public List<User> findFollowers(Integer userId){
+        checkUser(userId);
+
+        List<Follow> follows = followRepository.findFollowByFollowingId(userId);
+
+        if(follows.isEmpty()) throw new ApiException("No followers found");
+
+        List<User> followers = new ArrayList<>();
+
+        for(Follow f: follows){
+            followers.add(userRepository.findUserById(f.getFollowerId()));
+        }
+        return followers;
+    }
+
+    public List<User> findFollowings(Integer userId){
+        checkUser(userId);
+
+        List<Follow> follows = followRepository.findFollowByFollowerId(userId);
+
+        if(follows.isEmpty()) throw new ApiException("No followings found");
+
+        List<User> followings = new ArrayList<>();
+
+        for(Follow f: follows){
+            followings.add(userRepository.findUserById(f.getFollowingId()));
+        }
+        return followings;
     }
 
     public List<User> findMutualFollows(Integer userId){

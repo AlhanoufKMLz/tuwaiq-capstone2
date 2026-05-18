@@ -56,18 +56,18 @@ public class WhatsappService {
     public void shareRecipe(TranslateRecipeResponse recipe, String phoneNumber){
         Twilio.init(accountSid, authToken);
 
-        StringBuilder message = new StringBuilder(recipe.getRecipeName() + ":\n\n");
-        message.append("Description: ").append(recipe.getDescription()).append("\n");
-        message.append("Difficulty: ").append(recipe.getDifficulty()).append("\n");
-        message.append("Servings: ").append(recipe.getServings()).append("\n");
-        message.append("Cook Time: ").append(recipe.getCookTime()).append("\n\n");
+        StringBuilder message = new StringBuilder("\uD83C\uDF7D\uFE0F " + recipe.getRecipeName() + ":\n\n");
+        message.append("\uD83D\uDCDD Description: ").append(recipe.getDescription()).append("\n");
+        message.append("\uD83D\uDCAA Difficulty: ").append(recipe.getDifficulty()).append("\n");
+        message.append("\uD83D\uDC65 Servings: ").append(recipe.getServings()).append("\n");
+        message.append("⏱\uFE0F Cook Time: ").append(recipe.getCookTime()).append("\n\n");
 
-        message.append("Ingredients: ").append("\n");
+        message.append("\uD83D\uDED2 Ingredients: ").append("\n");
         recipe.getIngredients().forEach((ingredient) ->
                 message.append(ingredient.getName()).append(": ").append(ingredient.getAmount()).append(" ").append(ingredient.getUnit()).append("\n")
         );
 
-        message.append("Steps: ").append("\n");
+        message.append("\uD83D\uDC68\u200D\uD83C\uDF73 Steps: ").append("\n");
         recipe.getSteps().forEach((step) ->
                 message.append(step.getStepNumber()).append("- ").append(step.getInstruction()).append("\n")
         );

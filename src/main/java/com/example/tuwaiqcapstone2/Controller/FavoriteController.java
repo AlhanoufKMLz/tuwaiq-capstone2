@@ -32,15 +32,6 @@ public class FavoriteController {
         return ResponseEntity.status(200).body(new ApiResponse("Favorite added successfully"));
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateFavorite(@PathVariable Integer id, @RequestBody @Valid Favorite favorite, Errors errors){
-        if(errors.hasErrors())
-            return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
-
-        favoriteService.updateFavorite(id, favorite);
-        return ResponseEntity.status(200).body(new ApiResponse("Favorite updated successfully"));
-    }
-
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteFavorite(@PathVariable Integer id){
         favoriteService.deleteFavorite(id);

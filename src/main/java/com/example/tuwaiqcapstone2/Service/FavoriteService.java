@@ -48,16 +48,6 @@ public class FavoriteService {
         favoriteRepository.save(favorite);
     }
 
-    public void updateFavorite(Integer id, Favorite favorite){
-        Favorite oldFavorite = checkFavorite(id);
-        checkRecipe(favorite.getRecipeId());
-        checkUser(favorite.getUserId());
-
-        oldFavorite.setUserId(favorite.getUserId());
-        oldFavorite.setRecipeId(favorite.getRecipeId());
-        favoriteRepository.save(oldFavorite);
-    }
-
     public void deleteFavorite(Integer id){
         Favorite favorite = checkFavorite(id);
 
@@ -77,7 +67,7 @@ public class FavoriteService {
     }
 
     public List<Favorite> findFavoriteByUserId(Integer userId){
-        checkRecipe(userId);
+        checkUser(userId);
 
         List<Favorite> favorites = favoriteRepository.findFavoriteByUserId(userId);
 

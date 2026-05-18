@@ -60,6 +60,16 @@ public class UserController {
         return ResponseEntity.status(200).body(userService.getUsersSortedByRecipeRating());
     }
 
+    @GetMapping("/get-followers/{userId}")
+    public ResponseEntity<?> findFollowers(@PathVariable Integer userId){
+        return ResponseEntity.status(200).body(userService.findFollowers(userId));
+    }
+
+    @GetMapping("/get-followings/{userId}")
+    public ResponseEntity<?> findFollowings(@PathVariable Integer userId){
+        return ResponseEntity.status(200).body(userService.findFollowings(userId));
+    }
+
     @GetMapping("/get-mutual/{userId}")
     public ResponseEntity<?> findMutualFollows(@PathVariable Integer userId){
         return ResponseEntity.status(200).body(userService.findMutualFollows(userId));
