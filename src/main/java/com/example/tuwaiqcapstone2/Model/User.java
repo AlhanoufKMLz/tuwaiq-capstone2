@@ -1,6 +1,7 @@
 package com.example.tuwaiqcapstone2.Model;
 
 import com.example.tuwaiqcapstone2.Enums.AllergenType;
+import com.example.tuwaiqcapstone2.Enums.LanguageCode;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -8,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @Data
@@ -60,6 +62,16 @@ public class User {
     @CollectionTable(name = "user_allergens")
     @Column(name = "allergen")
     private List<AllergenType> allergens;
+
+    @Column(columnDefinition = "boolean default false")
+    private Boolean dailyRecipeSubscribed = false;
+
+    @Column(columnDefinition = "time default '08:00:00'")
+    private LocalTime dailyRecipeTime;
+
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "varchar(10) default 'EN'")
+    private LanguageCode dailyRecipeLanguage;
 
     @Column(columnDefinition = "datetime not null default CURRENT_TIMESTAMP", insertable = false)
     private LocalDateTime createdAt;

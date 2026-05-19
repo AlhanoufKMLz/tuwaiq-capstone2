@@ -1,6 +1,7 @@
 package com.example.tuwaiqcapstone2.Service;
 
 import com.example.tuwaiqcapstone2.Api.ApiException;
+import com.example.tuwaiqcapstone2.Enums.LanguageCode;
 import com.example.tuwaiqcapstone2.Model.Follow;
 import com.example.tuwaiqcapstone2.Model.Ingredient;
 import com.example.tuwaiqcapstone2.Model.Recipe;
@@ -12,6 +13,7 @@ import com.example.tuwaiqcapstone2.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,6 +47,8 @@ public class UserService {
         oldUser.setAge(user.getAge());
         oldUser.setPhoneNumber(user.getPhoneNumber());
         oldUser.setAllergens(user.getAllergens());
+        oldUser.setDailyRecipeSubscribed(user.getDailyRecipeSubscribed());
+        oldUser.setDailyRecipeTime(user.getDailyRecipeTime());
         userRepository.save(oldUser);
     }
 
@@ -128,6 +132,26 @@ public class UserService {
         }
         whatsappService.sendShoppingList(user.getPhoneNumber(), shoppingList);
 
+    }
+
+    public void subscribeToDailyRecipes(Integer userId , LocalTime time, LanguageCode language){
+        User user = checkUser(userId);
+
+        if(Boolean.TRUE.equals(user.getDailyRecipeSubscribed())) throw new ApiException("You already subscribed to daily recipes");
+
+        user.setDailyRecipeSubscribed(true);
+        user.setDailyRecipeTime(time);
+        user.setDailyRecipeLanguage(language);
+        userRepository.save(user);
+    }
+
+    public void unsubscribeToDailyRecipes(Integer userId){
+        User user = checkUser(userId);
+
+        if(!user.getDailyRecipeSubscribed()) throw new ApiException("You are not subscribed to daily recipes");
+
+        user.setDailyRecipeSubscribed(false);
+        userRepository.save(user);
     }
 
 

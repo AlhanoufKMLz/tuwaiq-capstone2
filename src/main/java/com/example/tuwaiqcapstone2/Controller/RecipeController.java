@@ -66,6 +66,11 @@ public class RecipeController {
         return ResponseEntity.status(200).body(recipeService.findRecipeWithNoAllergens());
     }
 
+    @GetMapping("/get-serving/{serving}")
+    public ResponseEntity<?> findRecipeByServings(@PathVariable Integer serving){
+        return ResponseEntity.status(200).body(recipeService.findRecipeByServings(serving));
+    }
+
     @GetMapping("/get-name/{keyword}")
     public ResponseEntity<?> findRecipeByName(@PathVariable String keyword){
         return ResponseEntity.status(200).body(recipeService.findRecipeByName(keyword));
@@ -140,5 +145,10 @@ public class RecipeController {
     public ResponseEntity<?> translateAndShare(@RequestBody @Valid TranslateAndShareRecipeRequest request){
         recipeService.translateAndShare(request.getRecipeId(), request.getLanguage(), request.getPhoneNumber());
         return ResponseEntity.status(200).body(new ApiResponse("Recipe shared successfully"));
+    }
+
+    @GetMapping("/get-altirnative/{recipeId}/{userId}")
+    public ResponseEntity<?> getHealthyAlternative(@PathVariable Integer recipeId, @PathVariable Integer userId){
+        return ResponseEntity.status(200).body(recipeService.getHealthyAlternative(recipeId,userId));
     }
 }

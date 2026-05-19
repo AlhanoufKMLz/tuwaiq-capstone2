@@ -10,12 +10,16 @@ import com.example.tuwaiqcapstone2.Model.*;
 import com.example.tuwaiqcapstone2.Repository.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 @Service
@@ -103,6 +107,16 @@ public class RecipeService {
 
     public List<Recipe> findRecipeWithNoAllergens(){
         List<Recipe> recipes = recipeRepository.findRecipeByAllergensEmpty();
+
+        if(recipes.isEmpty()) throw new ApiException("No recipes found");
+
+        return recipes;
+    }
+
+    public List<Recipe> findRecipeByServings(Integer serving){
+        if(serving < 0) throw new ApiException("Servings must be more than zero");
+
+        List<Recipe> recipes = recipeRepository.findRecipeByServings(serving);
 
         if(recipes.isEmpty()) throw new ApiException("No recipes found");
 
@@ -257,21 +271,23 @@ public class RecipeService {
     }
 
     public RecipeDetailsResponse convertServings(Integer recipeId, Integer newServings){
+        if(newServings < 0) throw new ApiException("Servings must be more than zero");
+
         RecipeDetailsResponse recipeDetails = getRecipeDetails(recipeId);
+        Integer oldServings = recipeDetails.getRecipe().getServings();
 
-        String prompt = "Given this recipe: " + recipeDetailsToString(recipeDetails) +
-                ". Convert all ingredient amounts to serve " + newServings + " people instead of " + recipeDetails.getRecipe().getServings() + "." +
-                " Return ONLY the same JSON structure with updated ingredient amounts and servings number. No extra text.";
+        //calculate the ratio
+        Double ratio = (double) newServings / oldServings;
 
-        String response = aiService.chat(prompt);
-
-        //convert json response into GenerateRecipeResponse object
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            return objectMapper.readValue(response, RecipeDetailsResponse.class);
-        } catch (JsonProcessingException e){
-            throw new ApiException("Failed to convert recipe");
+        //update the amounts
+        for(Ingredient i: recipeDetails.getIngredients()){
+            i.setAmount(i.getAmount() * ratio);
         }
+
+        //set new servings
+        recipeDetails.getRecipe().setServings(newServings);
+
+        return recipeDetails;
     }
 
     public TranslateRecipeResponse translateRecipe(Integer recipeId, LanguageCode language){
@@ -318,6 +334,64 @@ public class RecipeService {
         TranslateRecipeResponse recipe = translateRecipe(recipeId, language);
 
         whatsappService.shareRecipe(recipe, phoneNumber);
+    }
+
+    public GenerateRecipeResponse getHealthyAlternative(Integer recipeId, Integer userId) {
+        RecipeDetailsResponse recipeDetails = getRecipeDetails(recipeId);
+        User user = checkUser(userId);
+
+        //convert the ingredients into string
+        String ingredientsList = recipeDetails.getIngredients().stream()
+                .map(i -> i.getAmount() + " " + i.getUnit() + " " + i.getName())
+                .collect(Collectors.joining(", "));
+
+        //convert the allergens into string
+        String allergens = user.getAllergens().isEmpty()
+                ? "none"
+                : user.getAllergens().toString();
+
+        //Send the ingredient and allergens to AI
+        String prompt = "Given this recipe: " + recipeDetails.getRecipe().getName() +
+                " with these ingredients: " + ingredientsList +
+                ". Suggest a healthier alternative version of this recipe. " +
+                "The user is allergic to: " + allergens + " — avoid these completely. " +
+                " Generate a complete healthy alternative recipe. Return ONLY a JSON object with these exact keys: " +
+                "name, description, cookTime (number in minutes), difficulty (EASY, MEDIUM, or HARD), servings (number), " +
+                "ingredients (array of objects with: name, amount (number), unit must be one of: " + Arrays.toString(UnitType.values()) + "), " +
+                "steps (array of objects with: stepNumber, instruction). " +
+                "Example: {\"name\": \"Pasta\", \"description\": \"Delicious\", \"cookTime\": 30, \"difficulty\": \"EASY\", \"servings\": 4, " +
+                "\"ingredients\": [{\"name\": \"pasta\", \"amount\": 400, \"unit\": \"GRAM\"}], " +
+                "\"steps\": [{\"stepNumber\": 1, \"instruction\": \"Boil water\"}]}";
+
+        String response = aiService.chat(prompt);
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            return objectMapper.readValue(response, GenerateRecipeResponse.class);
+        } catch (Exception e) {
+            throw new ApiException("Failed to generate healthy alternative");
+        }
+    }
+
+    @Scheduled(cron = "0 * * * * *")
+    @Transactional
+    public void sendDailyRecipe() {
+        LocalTime now = LocalTime.now().withSecond(0).withNano(0);
+
+        List<User> users = userRepository.findUserByDailyRecipeSubscribedTrue();
+
+        for (User user : users) {
+            if (user.getDailyRecipeSubscribed() && user.getDailyRecipeTime().equals(now)) {
+                //get all safe recipes for the user
+                List<Recipe> safeRecipes = recipeRepository.findSafeRecipesForUser(user.getId());
+
+                if (!safeRecipes.isEmpty()) {
+                    //choose random one
+                    Recipe recipe = safeRecipes.get(new Random().nextInt(safeRecipes.size()));
+                    //translate and share
+                    translateAndShare(recipe.getId(), user.getDailyRecipeLanguage(), user.getPhoneNumber());
+                }
+            }
+        }
     }
 
 

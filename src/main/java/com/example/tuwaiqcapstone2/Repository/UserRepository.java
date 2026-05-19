@@ -12,6 +12,8 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     User findUserById(Integer id);
 
+    List<User> findUserByDailyRecipeSubscribedTrue();
+
     @Query("SELECT u FROM User u WHERE u.id IN (SELECT r.userId FROM Recipe r GROUP BY r.userId) ORDER BY (SELECT COUNT(r2) FROM Recipe r2 WHERE r2.userId = u.id) DESC")
     List<User> findUsersSortedByMostRecipes();
 

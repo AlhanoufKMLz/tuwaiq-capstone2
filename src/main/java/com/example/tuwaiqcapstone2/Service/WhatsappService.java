@@ -78,4 +78,8 @@ public class WhatsappService {
                 message.toString()
         ).create();
     }
+
+    public void sendScheduledRecipe(){
+
+    }
 }

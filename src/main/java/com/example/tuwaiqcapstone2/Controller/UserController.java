@@ -1,12 +1,16 @@
 package com.example.tuwaiqcapstone2.Controller;
 
 import com.example.tuwaiqcapstone2.Api.ApiResponse;
+import com.example.tuwaiqcapstone2.Enums.LanguageCode;
 import com.example.tuwaiqcapstone2.Model.User;
 import com.example.tuwaiqcapstone2.Service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalTime;
 
 @RestController
 @RequestMapping("/api/v1/user")
@@ -71,5 +75,17 @@ public class UserController {
     public ResponseEntity<?> generateShoppingList(@PathVariable Integer userId){
         userService.generateShoppingList(userId);
         return ResponseEntity.status(200).body(new ApiResponse("Shopping list sent to whatsApp successfully"));
+    }
+
+    @PutMapping("/subscribe/{userId}/{time}/{language}")
+    public ResponseEntity<?> subscribeToDailyRecipes(@PathVariable Integer userId, @PathVariable @DateTimeFormat(pattern = "HH:mm") LocalTime time, @PathVariable LanguageCode language) {
+        userService.subscribeToDailyRecipes(userId, time, language);
+        return ResponseEntity.status(200).body(new ApiResponse("Subscribed successfully"));
+    }
+
+    @PutMapping("/unsubscribe/{userId}")
+    public ResponseEntity<?> unsubscribeToDailyRecipes(@PathVariable Integer userId) {
+        userService.unsubscribeToDailyRecipes(userId);
+        return ResponseEntity.status(200).body(new ApiResponse("Unsubscribed successfully"));
     }
 }
