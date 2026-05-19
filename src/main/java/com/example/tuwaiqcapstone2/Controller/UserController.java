@@ -75,7 +75,7 @@ public class UserController {
         return ResponseEntity.status(200).body(userService.findMutualFollows(userId));
     }
 
-    @PostMapping("/shopping-list/{userId}")
+    @GetMapping("/shopping-list/{userId}")
     public ResponseEntity<?> generateShoppingList(@PathVariable Integer userId){
         userService.generateShoppingList(userId);
         return ResponseEntity.status(200).body(new ApiResponse("Shopping list sent to whatsApp successfully"));

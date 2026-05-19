@@ -141,7 +141,7 @@ public class RecipeController {
         return ResponseEntity.status(200).body(recipeService.convertServings(recipeId, serving));
     }
 
-    @PostMapping("/translate/{recipeId}/{language}")
+    @GetMapping("/translate/{recipeId}/{language}")
     public ResponseEntity<?> translateRecipe(@PathVariable Integer recipeId, @PathVariable LanguageCode language){
         return ResponseEntity.status(200).body(recipeService.translateRecipe(recipeId, language));
     }

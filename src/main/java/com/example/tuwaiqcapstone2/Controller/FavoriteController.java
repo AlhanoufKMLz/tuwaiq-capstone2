@@ -47,6 +47,6 @@ public class FavoriteController {
 
     @GetMapping("/get-user/{userId}")
     public ResponseEntity<?> findFavoriteByUserId(@PathVariable Integer userId){
-        return ResponseEntity.status(200).body(favoriteService.findFavoriteByRecipeId(userId));
+        return ResponseEntity.status(200).body(favoriteService.findFavoriteByUserId(userId));
     }
 }

@@ -58,6 +58,6 @@ public class RecipeStepController {
     @PostMapping("/generate/{recipeId}")
     public ResponseEntity<?> generateRecipeSteps(@PathVariable Integer recipeId, @RequestBody @Valid RecipeStepsRequest request) {
         recipeStepService.generateRecipeSteps(recipeId, request.getInstructions());
-        return ResponseEntity.ok("Steps generated successfully");
+        return ResponseEntity.ok(new ApiResponse("Steps generated successfully"));
     }
 }
