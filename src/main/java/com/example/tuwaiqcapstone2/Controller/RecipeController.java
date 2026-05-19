@@ -10,7 +10,6 @@ import com.example.tuwaiqcapstone2.Service.RecipeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -28,19 +27,13 @@ public class RecipeController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> addRecipe(@RequestBody @Valid Recipe recipe, Errors errors){
-        if(errors.hasErrors())
-            return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
-
+    public ResponseEntity<?> addRecipe(@RequestBody @Valid Recipe recipe){
         recipeService.addRecipe(recipe);
         return ResponseEntity.status(200).body(new ApiResponse("Recipe added successfully"));
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateRecipe(@PathVariable Integer id, @RequestBody @Valid Recipe recipe, Errors errors){
-        if(errors.hasErrors())
-            return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
-
+    public ResponseEntity<?> updateRecipe(@PathVariable Integer id, @RequestBody @Valid Recipe recipe){
         recipeService.updateRecipe(id, recipe);
         return ResponseEntity.status(200).body(new ApiResponse("Recipe updated successfully"));
     }
@@ -129,10 +122,7 @@ public class RecipeController {
     }
 
     @PostMapping("/generate")
-    public ResponseEntity<?> generateRecipe(@RequestBody GenerateRecipeRequest request, Errors errors){
-        if(errors.hasErrors())
-            return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
-
+    public ResponseEntity<?> generateRecipe(@RequestBody @Valid GenerateRecipeRequest request){
         return ResponseEntity.status(200).body(recipeService.generateRecipe(request));
     }
 
@@ -147,10 +137,7 @@ public class RecipeController {
     }
 
     @PostMapping("/translate-share")
-    public ResponseEntity<?> translateAndShare(@RequestBody @Valid TranslateAndShareRecipeRequest request, Errors errors){
-        if(errors.hasErrors())
-            return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
-
+    public ResponseEntity<?> translateAndShare(@RequestBody @Valid TranslateAndShareRecipeRequest request){
         recipeService.translateAndShare(request.getRecipeId(), request.getLanguage(), request.getPhoneNumber());
         return ResponseEntity.status(200).body(new ApiResponse("Recipe shared successfully"));
     }

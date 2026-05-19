@@ -6,7 +6,6 @@ import com.example.tuwaiqcapstone2.Service.RatingService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -24,19 +23,13 @@ public class RatingController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> addRating(@RequestBody @Valid Rating rating, Errors errors){
-        if(errors.hasErrors())
-            return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
-
+    public ResponseEntity<?> addRating(@RequestBody @Valid Rating rating){
         ratingService.addRating(rating);
         return ResponseEntity.status(200).body(new ApiResponse("Rating added successfully"));
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateRating(@PathVariable Integer id, @RequestBody @Valid Rating rating, Errors errors){
-        if(errors.hasErrors())
-            return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
-
+    public ResponseEntity<?> updateRating(@PathVariable Integer id, @RequestBody @Valid Rating rating){
         ratingService.updateRating(id, rating);
         return ResponseEntity.status(200).body(new ApiResponse("Rating updated successfully"));
     }

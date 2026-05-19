@@ -6,7 +6,6 @@ import com.example.tuwaiqcapstone2.Service.FollowService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -24,10 +23,7 @@ public class FollowController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> addFollow(@RequestBody @Valid Follow follow, Errors errors){
-        if(errors.hasErrors())
-            return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
-
+    public ResponseEntity<?> addFollow(@RequestBody @Valid Follow follow){
         followService.addFollow(follow);
         return ResponseEntity.status(200).body(new ApiResponse("Follow added successfully"));
     }

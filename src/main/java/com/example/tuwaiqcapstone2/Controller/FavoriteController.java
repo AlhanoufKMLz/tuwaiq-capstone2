@@ -6,7 +6,6 @@ import com.example.tuwaiqcapstone2.Service.FavoriteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -24,10 +23,7 @@ public class FavoriteController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> addFavorite(@RequestBody @Valid Favorite favorite, Errors errors){
-        if(errors.hasErrors())
-            return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
-
+    public ResponseEntity<?> addFavorite(@RequestBody @Valid Favorite favorite){
         favoriteService.addFavorite(favorite);
         return ResponseEntity.status(200).body(new ApiResponse("Favorite added successfully"));
     }

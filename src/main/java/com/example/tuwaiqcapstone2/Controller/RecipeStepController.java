@@ -7,7 +7,6 @@ import com.example.tuwaiqcapstone2.Service.RecipeStepService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -25,19 +24,13 @@ public class RecipeStepController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> addRecipeStep(@RequestBody @Valid RecipeStep recipeStep, Errors errors){
-        if(errors.hasErrors())
-            return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
-
+    public ResponseEntity<?> addRecipeStep(@RequestBody @Valid RecipeStep recipeStep){
         recipeStepService.addRecipeStep(recipeStep);
         return ResponseEntity.status(200).body(new ApiResponse("Recipe Step added successfully"));
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateRecipeStep(@PathVariable Integer id, @RequestBody @Valid RecipeStep recipeStep, Errors errors){
-        if(errors.hasErrors())
-            return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
-
+    public ResponseEntity<?> updateRecipeStep(@PathVariable Integer id, @RequestBody @Valid RecipeStep recipeStep){
         recipeStepService.updateRecipeStep(id, recipeStep);
         return ResponseEntity.status(200).body(new ApiResponse("Recipe Step updated successfully"));
     }

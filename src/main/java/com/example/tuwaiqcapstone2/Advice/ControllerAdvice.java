@@ -1,0 +1,86 @@
+package com.example.tuwaiqcapstone2.Advice;
+
+import com.example.tuwaiqcapstone2.Api.ApiException;
+import com.example.tuwaiqcapstone2.Api.ApiResponse;
+import jakarta.validation.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.InvalidDataAccessResourceUsageException;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.sql.SQLIntegrityConstraintViolationException;
+
+@RestControllerAdvice
+public class ControllerAdvice {
+
+    @ExceptionHandler(value = ApiException.class)
+    public ResponseEntity<?> ApiException(ApiException e){
+        return ResponseEntity.status(400).body(new ApiResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler(value = MethodArgumentNotValidException.class)
+    public ResponseEntity<?> MethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        return ResponseEntity.status(400).body(new ApiResponse(e.getFieldError().getDefaultMessage()));
+    }
+
+    @ExceptionHandler(value = ConstraintViolationException.class)
+    public ResponseEntity<ApiResponse> ConstraintViolationException(ConstraintViolationException e) {
+        return ResponseEntity.status(400).body(new ApiResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler(value = SQLIntegrityConstraintViolationException.class)
+    public ResponseEntity<ApiResponse> SQLIntegrityConstraintViolationException(SQLIntegrityConstraintViolationException e){
+        return ResponseEntity.status(400).body(new ApiResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler(value = InvalidDataAccessResourceUsageException.class )
+    public ResponseEntity<?> InvalidDataAccessResourceUsageException(InvalidDataAccessResourceUsageException e){
+        return ResponseEntity.status(200).body(new ApiResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler(value = DataIntegrityViolationException.class)
+    public ResponseEntity<ApiResponse> DataIntegrityViolationException(DataIntegrityViolationException e){
+        return ResponseEntity.status(400).body(new ApiResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler(value = HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ApiResponse> HttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
+        return ResponseEntity.status(400).body(new ApiResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler(value = HttpMessageNotReadableException.class)
+    public ResponseEntity<ApiResponse> HttpMessageNotReadableException(HttpMessageNotReadableException e){
+        return ResponseEntity.status(400).body(new ApiResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler(value = MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ApiResponse> MethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e) {
+        String message = e.getMessage();
+
+        if (message.contains("DifficultyLevel"))
+            return ResponseEntity.status(400).body(new ApiResponse("Difficulty must be: EASY, MEDIUM, or HARD"));
+
+        if (message.contains("LanguageCode"))
+            return ResponseEntity.status(400).body(new ApiResponse("Invalid language code"));
+
+        if (message.contains("UnitType"))
+            return ResponseEntity.status(400).body(new ApiResponse("Invalid unit type"));
+
+        return ResponseEntity.status(400).body(new ApiResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler(value = IllegalArgumentException.class)
+    public ResponseEntity<ApiResponse> IllegalArgumentException(IllegalArgumentException e) {
+        return ResponseEntity.status(400).body(new ApiResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler(value = NullPointerException.class)
+    public ResponseEntity<ApiResponse> NullPointerException(NullPointerException e) {
+        return ResponseEntity.status(400).body(new ApiResponse(e.getMessage()));
+    }
+}

@@ -6,7 +6,6 @@ import com.example.tuwaiqcapstone2.Service.IngredientService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -24,19 +23,13 @@ public class IngredientController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> addIngredient(@RequestBody @Valid Ingredient ingredient, Errors errors){
-        if(errors.hasErrors())
-            return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
-
+    public ResponseEntity<?> addIngredient(@RequestBody @Valid Ingredient ingredient){
         ingredientService.addIngredient(ingredient);
         return ResponseEntity.status(200).body(new ApiResponse("Ingredient added successfully"));
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateIngredient(@PathVariable Integer id, @RequestBody @Valid Ingredient ingredient, Errors errors){
-        if(errors.hasErrors())
-            return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
-
+    public ResponseEntity<?> updateIngredient(@PathVariable Integer id, @RequestBody @Valid Ingredient ingredient){
         ingredientService.updateIngredient(id, ingredient);
         return ResponseEntity.status(200).body(new ApiResponse("Ingredient updated successfully"));
     }
