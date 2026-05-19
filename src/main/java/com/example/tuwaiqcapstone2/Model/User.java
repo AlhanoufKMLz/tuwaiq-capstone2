@@ -63,14 +63,14 @@ public class User {
     @Column(name = "allergen")
     private List<AllergenType> allergens;
 
-    @Column(columnDefinition = "boolean default false")
+    @Column(columnDefinition = "boolean default false", insertable = false)
     private Boolean dailyRecipeSubscribed = false;
 
-    @Column(columnDefinition = "time default '08:00:00'")
+    @Column(columnDefinition = "time default '08:00:00'", insertable = false)
     private LocalTime dailyRecipeTime;
 
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "varchar(10) default 'EN'")
+    @Column(columnDefinition = "varchar(10) default 'EN'", insertable = false)
     private LanguageCode dailyRecipeLanguage;
 
     @Column(columnDefinition = "datetime not null default CURRENT_TIMESTAMP", insertable = false)

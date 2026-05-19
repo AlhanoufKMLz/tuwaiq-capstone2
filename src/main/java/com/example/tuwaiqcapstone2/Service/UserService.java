@@ -137,7 +137,7 @@ public class UserService {
     public void subscribeToDailyRecipes(Integer userId , LocalTime time, LanguageCode language){
         User user = checkUser(userId);
 
-        if(Boolean.TRUE.equals(user.getDailyRecipeSubscribed())) throw new ApiException("You already subscribed to daily recipes");
+        if(user.getDailyRecipeSubscribed()) throw new ApiException("You already subscribed to daily recipes");
 
         user.setDailyRecipeSubscribed(true);
         user.setDailyRecipeTime(time);
